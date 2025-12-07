@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LOGIN Kantin - Sistem Pre-Order</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,6 +21,24 @@
             --text-light: #6b7280;
             --bg-light: #f9fafb;
             --border: #e5e7eb;
+        }
+
+        /* RESET UTAMA UNTUK MOBILE */
+        * {
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Fix untuk mencegah horizontal scroll */
+        .container {
+            width: 100%;
+            max-width: 100%;
         }
 
         @keyframes fadeIn {
@@ -84,34 +102,142 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        /* Swiper custom */
+        /* Swiper custom - PERBAIKAN UNTUK MOBILE */
         .swiper-container {
             width: 100%;
+            max-width: 100vw;
             padding: 0 12px 12px;
+            overflow: hidden;
         }
 
         .swiper-slide {
             width: auto !important;
         }
+
+        /* PERBAIKAN UTAMA UNTUK RESPONSIVE */
+        @media (max-width: 640px) {
+            /* Container mobile-first */
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            /* Modal sidebar untuk mobile */
+            #cartSidebar .absolute.inset-y-0.right-0 {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            /* Toast notification mobile-friendly */
+            #toast {
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 2rem);
+                max-width: calc(100% - 2rem);
+                margin: 0 1rem;
+            }
+            
+            /* Menu grid lebih compact di mobile */
+            #menuGrid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            /* Card menu di mobile */
+            .card-hover {
+                margin: 0;
+                border-radius: 0.5rem;
+            }
+            
+            /* Floating button position fix untuk mobile */
+            #floatingCartBtn {
+                right: 1rem;
+                bottom: 1rem;
+            }
+            
+            /* Header lebih compact */
+            header .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            /* Hero section padding adjustment */
+            .bg-gradient-to-r .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            /* Contact cards full width di mobile */
+            .grid-cols-1 {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Modal content tidak overflow */
+            .absolute.inset-x-0.bottom-0 {
+                width: 100%;
+                max-width: 100vw;
+                left: 0;
+                right: 0;
+            }
+            
+            /* Form inputs tidak overflow */
+            input, select, textarea {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            /* Countdown text tidak terlalu besar */
+            #countdown {
+                font-size: 1.5rem;
+            }
+            
+            /* Tombol kategori swiper */
+            .swiper-wrapper {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+        }
+
+        @media (min-width: 641px) and (max-width: 768px) {
+            /* Tablet optimization */
+            #menuGrid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Utility classes untuk mencegah overflow */
+        .no-overflow {
+            overflow: hidden;
+        }
+        
+        .full-width {
+            width: 100%;
+            max-width: 100vw;
+        }
+        
+        .mobile-padding {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans antialiased">
+<body class="bg-gray-50 text-gray-900 font-sans antialiased no-overflow">
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
-        <div class="container mx-auto px-4 py-3">
+    <header class="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200 full-width">
+        <div class="container mx-auto px-4 py-3 mobile-padding">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
                         <i class="fas fa-utensils text-white text-lg"></i>
                     </div>
-                    <div>
-                        <h1 class="font-bold text-lg text-blue-800">LOGIN</h1>
-                        <p class="text-xs text-gray-600">Sistem Pre-Order STMIK TAZKIA</p>
+                    <div class="max-w-[70%]">
+                        <h1 class="font-bold text-lg text-blue-800 truncate">LOGIN</h1>
+                        <p class="text-xs text-gray-600 truncate">Sistem Pre-Order</p>
                     </div>
                 </div>
                 
                 <!-- Cart Button -->
-                <button id="cartBtn" class="relative p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" aria-label="Keranjang belanja">
+                <button id="cartBtn" class="relative p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex-shrink-0" aria-label="Keranjang belanja">
                     <i class="fas fa-shopping-cart text-gray-700 text-xl"></i>
                     <span id="cartCount" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
                 </button>
@@ -120,21 +246,21 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-        <div class="container mx-auto px-4 py-8">
-            <div class="max-w-2xl mx-auto">
-                <h1 class="text-2xl md:text-3xl font-bold mb-3 text-center">Logaritma Kantin</h1>
+    <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white full-width">
+        <div class="container mx-auto px-4 py-8 mobile-padding">
+            <div class="max-w-2xl mx-auto full-width">
+                <h1 class="text-2xl md:text-3xl font-bold mb-3 text-center">Logaritma Kantin STMIK Tazkia</h1>
                 <p class="text-blue-100 mb-6 text-center">Pre-Order H-1 untuk pengambilan besok</p>
                 
                 <!-- Countdown -->
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-6">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-6 full-width">
                     <p class="text-sm mb-2 text-center">Pre-Order sebelum:</p>
                     <div id="countdown" class="text-2xl font-bold text-yellow-300 text-center tabular-nums">20:00:00</div>
                     <p class="text-xs mt-2 text-blue-100 text-center">Jam 20:00 pre-order untuk besok ditutup</p>
                 </div>
 
                 <!-- Info Card -->
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5 mb-6">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5 mb-6 full-width">
                     <h3 class="font-bold mb-3 flex items-center">
                         <i class="fas fa-info-circle mr-2 text-yellow-300"></i>
                         Ketentuan Pre-Order
@@ -142,15 +268,15 @@
                     <ul class="space-y-2 text-sm mb-4">
                         <li class="flex items-start">
                             <i class="fas fa-check-circle text-green-300 mr-2 mt-0.5 flex-shrink-0"></i>
-                            <span>Pre-order hanya bisa dilakukan <strong>HARI INI</strong> untuk pengambilan BESOK</span>
+                            <span class="break-words">Pre-order hanya bisa dilakukan <strong>HARI INI</strong> untuk pengambilan BESOK</span>
                         </li>
                         <li class="flex items-start">
                             <i class="fas fa-clock text-yellow-300 mr-2 mt-0.5 flex-shrink-0"></i>
-                            <span>Waktu pre-order: <strong>07:00 - 20:00 WIB</strong> setiap hari</span>
+                            <span class="break-words">Waktu pre-order: <strong>07:00 - 20:00 WIB</strong> setiap hari</span>
                         </li>
                         <li class="flex items-start">
                             <i class="fas fa-box text-blue-300 mr-2 mt-0.5 flex-shrink-0"></i>
-                            <span>Waktu pengambilan besok: <strong>12:00 - 13:00 WIB</strong></span>
+                            <span class="break-words">Waktu pengambilan besok: <strong>12:00 - 13:00 WIB</strong></span>
                         </li>
                     </ul>
                     
@@ -174,8 +300,8 @@
     </section>
 
     <!-- Search Bar -->
-    <div class="bg-white border-b border-gray-200">
-        <div class="container mx-auto px-4 py-3">
+    <div class="bg-white border-b border-gray-200 full-width">
+        <div class="container mx-auto px-4 py-3 mobile-padding">
             <div class="relative">
                 <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 <input type="text" 
@@ -187,10 +313,10 @@
     </div>
 
     <!-- Category Swiper -->
-    <section class="bg-white border-b border-gray-200" id="menu">
-        <div class="container mx-auto">
+    <section class="bg-white border-b border-gray-200 full-width" id="menu">
+        <div class="container mx-auto full-width">
             <div class="swiper-container">
-                <div class="swiper-wrapper py-3" id="categorySwiper" role="tablist">
+                <div class="swiper-wrapper py-3 mobile-padding" id="categorySwiper" role="tablist">
                     <!-- Categories will be populated by JS -->
                 </div>
                 <div class="swiper-scrollbar mt-2"></div>
@@ -199,13 +325,13 @@
     </section>
 
     <!-- Menu Grid -->
-    <main class="container mx-auto px-4 py-6">
+    <main class="container mx-auto px-4 py-6 mobile-padding full-width">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="menuGrid">
             <!-- Menu items will be populated by JS -->
         </div>
         
         <!-- Empty State -->
-        <div id="emptyState" class="hidden text-center py-12">
+        <div id="emptyState" class="hidden text-center py-12 full-width">
             <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-search text-gray-400 text-2xl"></i>
             </div>
@@ -215,34 +341,34 @@
     </main>
 
     <!-- Contact Section -->
-    <section class="bg-gray-50 border-t border-gray-200 py-12">
-        <div class="container mx-auto px-4">
+    <section class="bg-gray-50 border-t border-gray-200 py-12 full-width">
+        <div class="container mx-auto px-4 mobile-padding">
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Kontak & Informasi</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
                 <a href="https://wa.me/6281286406001" 
                    target="_blank" 
                    rel="noopener noreferrer"
-                   class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex items-center space-x-4">
+                   class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex items-center space-x-4 full-width">
                     <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                         <i class="fab fa-whatsapp text-green-600 text-xl"></i>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">WhatsApp Admin</h3>
-                        <p class="text-sm text-gray-600 mt-1">Dayana (+62 812-8640-6001)</p>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-gray-800 truncate">WhatsApp Admin</h3>
+                        <p class="text-sm text-gray-600 mt-1 truncate">Dayana (+62 812-8640-6001)</p>
                     </div>
                 </a>
                 
                 <a href="https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137" 
                    target="_blank" 
                    rel="noopener noreferrer"
-                   class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex items-center space-x-4">
+                   class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex items-center space-x-4 full-width">
                     <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                         <i class="fab fa-whatsapp text-green-600 text-xl"></i>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-gray-800">WhatsApp Channel</h3>
-                        <p class="text-sm text-gray-600 mt-1">Update Menu & Info Terbaru</p>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-gray-800 truncate">WhatsApp Channel</h3>
+                        <p class="text-sm text-gray-600 mt-1 truncate">Update Menu & Info Terbaru</p>
                     </div>
                 </a>
             </div>
@@ -250,8 +376,8 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-blue-800 text-white py-8">
-        <div class="container mx-auto px-4">
+    <footer class="bg-blue-800 text-white py-8 full-width">
+        <div class="container mx-auto px-4 mobile-padding">
             <div class="flex flex-col md:flex-row items-center justify-between">
                 <div class="mb-6 md:mb-0">
                     <div class="flex items-center space-x-3 mb-3">
@@ -263,14 +389,14 @@
                     <a href="https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137" 
                        target="_blank" 
                        rel="noopener noreferrer"
-                       class="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                       class="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center hover:bg-blue-600 transition-colors flex-shrink-0"
                        aria-label="WhatsApp Channel">
                         <i class="fab fa-whatsapp"></i>
                     </a>
                     <a href="https://www.instagram.com/p/DO-4cI9ibgv/" 
                        target="_blank" 
                        rel="noopener noreferrer"
-                       class="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                       class="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center hover:bg-blue-600 transition-colors flex-shrink-0"
                        aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
                     </a>
@@ -281,7 +407,7 @@
 
     <!-- Floating Cart Button -->
     <button id="floatingCartBtn" 
-            class="fixed bottom-6 right-4 z-40 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            class="fixed bottom-6 right-4 z-40 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 mobile-fixed"
             aria-label="Buka keranjang">
         <i class="fas fa-shopping-cart text-xl"></i>
         <span id="floatingCartCount" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
@@ -290,11 +416,11 @@
     <!-- Cart Sidebar -->
     <div id="cartSidebar" class="fixed inset-0 z-50 hidden" aria-hidden="true">
         <div class="absolute inset-0 bg-black bg-opacity-50" id="cartOverlay"></div>
-        <div class="absolute inset-y-0 right-0 w-full max-w-md bg-white flex flex-col slide-in" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+        <div class="absolute inset-y-0 right-0 w-full sm:max-w-md bg-white flex flex-col slide-in full-width" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
             <!-- Cart Header -->
             <div class="flex items-center justify-between p-4 border-b border-gray-200">
                 <h2 id="cartTitle" class="text-xl font-bold">Keranjang Pre-Order</h2>
-                <button id="closeCart" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                <button id="closeCart" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 flex-shrink-0">
                     <i class="fas fa-times text-gray-600 text-lg"></i>
                 </button>
             </div>
@@ -332,7 +458,7 @@
     <!-- Menu Detail Modal -->
     <div id="menuModal" class="fixed inset-0 z-50 hidden" aria-hidden="true">
         <div class="absolute inset-0 bg-black bg-opacity-50" id="menuModalOverlay"></div>
-        <div class="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl max-h-[90vh] overflow-y-auto fade-in" role="dialog" aria-modal="true">
+        <div class="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl max-h-[90vh] overflow-y-auto fade-in full-width" role="dialog" aria-modal="true">
             <!-- Modal content will be populated by JS -->
         </div>
     </div>
@@ -340,12 +466,12 @@
     <!-- Checkout Modal -->
     <div id="checkoutModal" class="fixed inset-0 z-50 hidden" aria-hidden="true">
         <div class="absolute inset-0 bg-black bg-opacity-50" id="checkoutOverlay"></div>
-        <div class="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl max-h-[90vh] overflow-y-auto fade-in" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
-            <div class="p-6">
+        <div class="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl max-h-[90vh] overflow-y-auto fade-in full-width" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+            <div class="p-6 mobile-padding">
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-6">
                     <h2 id="checkoutTitle" class="text-xl font-bold">Konfirmasi Pre-Order</h2>
-                    <button id="closeCheckoutModal" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    <button id="closeCheckoutModal" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 flex-shrink-0">
                         <i class="fas fa-times text-gray-600 text-lg"></i>
                     </button>
                 </div>
@@ -452,12 +578,12 @@
 
     <!-- Toast Notification -->
     <div id="toast" 
-         class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50 hidden fade-in max-w-xs"
+         class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-3 rounded-lg shadow-lg z-50 hidden fade-in max-w-[calc(100%-2rem)]"
          role="alert"
          aria-live="polite">
-        <div class="flex items-center">
-            <i class="fas fa-check-circle mr-2 text-green-400"></i>
-            <span id="toastMessage"></span>
+        <div class="flex items-center justify-center">
+            <i class="fas fa-check-circle mr-2 text-green-400 flex-shrink-0"></i>
+            <span id="toastMessage" class="truncate"></span>
         </div>
     </div>
 
@@ -1043,7 +1169,7 @@
                                 ${item.category}
                             </span>
                         </div>
-                        <button id="closeMenuModal" class="p-2 rounded-full hover:bg-gray-100 ml-4 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        <button id="closeMenuModal" class="p-2 rounded-full hover:bg-gray-100 ml-4 focus:outline-none focus:ring-2 focus:ring-gray-300 flex-shrink-0">
                             <i class="fas fa-times text-gray-600 text-lg"></i>
                         </button>
                     </div>
