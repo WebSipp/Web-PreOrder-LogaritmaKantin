@@ -4,1425 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LOGIN Kantin - Sistem Pre-Order</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <style>
-        /* ===== ROOT VARIABLES ===== */
         :root {
-            --primary-blue: #1E40AF;
-            --secondary-blue: #1E3A8A;
-            --accent-yellow: #FBBF24;
-            --accent-orange: #EA580C;
-            --accent-green: #10B981;
-            --accent-red: #DC2626;
-            --text-dark: #1F2937;
-            --text-gray: #4B5563;
-            --bg-light: #F9FAFB;
-            --bg-white: #FFFFFF;
-            --border-gray: #E5E7EB;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --border: #e5e7eb;
         }
 
-        /* ===== BASE STYLES ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 80px;
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            color: var(--text-dark);
-            background: var(--bg-white);
-            line-height: 1.6;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
         }
 
-        section {
-            padding: 5rem 0;
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
         }
 
-        h1, h2, h3, h4 {
-            font-weight: 700;
-            line-height: 1.2;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
         }
 
-        /* ===== HEADER & NAVIGATION ===== */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            position: relative;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            border-radius: var(--radius-md);
+        /* Image placeholder */
+        .img-placeholder {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 24px;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition);
         }
 
-        .logo-text {
-            display: flex;
-            flex-direction: column;
+        /* Loading skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
         }
 
-        .logo-text .main {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-            line-height: 1.2;
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
-        .logo-text .sub {
-            font-size: 0.875rem;
-            color: var(--text-gray);
-            font-weight: 500;
+        /* Card hover effect */
+        .card-hover {
+            transition: all 0.2s ease;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--text-dark);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 0;
-            position: relative;
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover {
-            color: var(--primary-blue);
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary-blue);
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .cart-icon {
-            position: relative;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
-        }
-
-        .cart-icon:hover {
-            background: var(--bg-light);
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--accent-orange);
-            color: white;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .hamburger {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text-dark);
-            cursor: pointer;
-            padding: 0.5rem;
-            z-index: 1001;
-        }
-
-        /* ===== HERO SECTION ===== */
-        .hero {
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            color: white;
-            padding: 8rem 0 5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #particles-js {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, white, var(--accent-yellow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero .tagline {
-            font-size: 1.25rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-        }
-
-        .countdown-wrapper {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius-xl);
-            padding: 2rem;
-            margin: 2rem auto;
-            max-width: 500px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .countdown-label {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            opacity: 0.9;
-        }
-
-        .countdown-status {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 1rem;
-        }
-
-        .countdown-timer {
-            font-size: 2.5rem;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-            color: var(--accent-yellow);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .info-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            margin: 2rem auto;
-            max-width: 700px;
-            text-align: left;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .info-card h3 {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 1.5rem;
-            color: var(--accent-yellow);
-        }
-
-        .info-card ul {
-            list-style: none;
-            margin-bottom: 1.5rem;
-        }
-
-        .info-card li {
-            margin-bottom: 0.75rem;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-
-        .info-card li::before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--accent-yellow);
-            font-weight: bold;
-        }
-
-        .cta-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--accent-orange);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
-            border: none;
-            cursor: pointer;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(234, 88, 12, 0.4);
-            background: var(--accent-yellow);
-            color: var(--text-dark);
-        }
-
-        .whatsapp-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--accent-green);
-            color: white;
-            padding: 0.875rem 1.5rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 1rem;
-            transition: var(--transition);
-        }
-
-        .whatsapp-link:hover {
-            background: #0da271;
+        .card-hover:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        /* ===== MENU SECTION ===== */
-        .menu-section {
-            background: var(--bg-light);
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .section-title h2 {
-            font-size: 2.5rem;
-            color: var(--primary-blue);
-            margin-bottom: 1rem;
-        }
-
-        .section-title p {
-            color: var(--text-gray);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .menu-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .category-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            justify-content: center;
-        }
-
-        .category-btn {
-            padding: 0.75rem 1.5rem;
-            background: white;
-            border: 2px solid var(--border-gray);
-            border-radius: 50px;
-            font-weight: 600;
-            color: var(--text-gray);
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-
-        .category-btn.active,
-        .category-btn:hover {
-            background: var(--primary-blue);
-            border-color: var(--primary-blue);
-            color: white;
-        }
-
-        .search-box {
-            position: relative;
-            max-width: 500px;
-            margin: 0 auto;
+        /* Swiper custom */
+        .swiper-container {
             width: 100%;
+            padding: 0 12px 12px;
         }
 
-        .search-box input {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            padding-right: 3rem;
-            border: 2px solid var(--border-gray);
-            border-radius: 50px;
-            font-size: 1rem;
-            transition: var(--transition);
-            background: white;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-        }
-
-        .search-box i {
-            position: absolute;
-            right: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-gray);
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-        }
-
-        .menu-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .menu-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .menu-image {
-            height: 200px;
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary-blue), var(--accent-yellow));
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .menu-card:hover .menu-image img {
-            transform: scale(1.05);
-        }
-
-        .image-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3.5rem;
-            background: linear-gradient(135deg, var(--primary-blue), var(--accent-yellow));
-        }
-
-        .menu-content {
-            padding: 1.5rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .menu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .menu-header h3 {
-            font-size: 1.25rem;
-            color: var(--text-dark);
-            flex: 1;
-        }
-
-        .menu-price {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--accent-orange);
-            white-space: nowrap;
-            margin-left: 1rem;
-        }
-
-        .menu-category {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: var(--bg-light);
-            color: var(--text-gray);
-            border-radius: 50px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            align-self: flex-start;
-        }
-
-        .menu-description {
-            font-size: 0.9rem;
-            color: var(--text-gray);
-            margin-bottom: 1rem;
-            line-height: 1.5;
-            flex-grow: 1;
-        }
-
-        .menu-details {
-            font-size: 0.85rem;
-            color: var(--accent-orange);
-            font-weight: 600;
-            margin-bottom: 1rem;
-            background: var(--bg-light);
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--radius-sm);
-            border-left: 3px solid var(--accent-orange);
-        }
-
-        .add-to-cart-btn {
-            margin-top: auto;
-            background: var(--primary-blue);
-            color: white;
-            border: none;
-            padding: 0.875rem;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .add-to-cart-btn:hover {
-            background: var(--secondary-blue);
-        }
-
-        .add-to-cart-btn.added {
-            background: var(--accent-green);
-        }
-
-        /* ===== CART SIDEBAR ===== */
-        .cart-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-        }
-
-        .cart-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .cart-sidebar {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 100%;
-            max-width: 450px;
-            height: 100vh;
-            background: white;
-            box-shadow: -5px 0 25px rgba(0,0,0,0.15);
-            z-index: 2001;
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .cart-sidebar.active {
-            right: 0;
-        }
-
-        .cart-header {
-            padding: 1.5rem;
-            background: var(--primary-blue);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .close-cart {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
-        }
-
-        .close-cart:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .cart-items {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 1.5rem;
-        }
-
-        .cart-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: var(--bg-light);
-            border-radius: var(--radius-md);
-            margin-bottom: 1rem;
-        }
-
-        .cart-item-image {
-            width: 60px;
-            height: 60px;
-            border-radius: var(--radius-sm);
-            background: linear-gradient(135deg, var(--primary-blue), var(--accent-yellow));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-
-        .cart-item-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .cart-item-info {
-            flex-grow: 1;
-            min-width: 0;
-        }
-
-        .cart-item-info h4 {
-            margin-bottom: 0.25rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .cart-item-price {
-            color: var(--accent-orange);
-            font-weight: 600;
-        }
-
-        .cart-item-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-top: 0.5rem;
-        }
-
-        .quantity-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 1px solid var(--border-gray);
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 600;
-        }
-
-        .quantity-btn:hover {
-            background: var(--bg-light);
-            border-color: var(--primary-blue);
-        }
-
-        .cart-total {
-            padding: 1.5rem;
-            background: var(--bg-light);
-            border-top: 2px solid var(--border-gray);
-            flex-shrink: 0;
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        .checkout-btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--accent-orange);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 1.125rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .checkout-btn:hover {
-            background: var(--accent-yellow);
-            color: var(--text-dark);
-        }
-
-        /* ===== PRE-ORDER MODAL ===== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-            padding: 20px;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .pre-order-modal {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-            transform: translateY(20px);
-            transition: var(--transition);
-        }
-
-        .modal-overlay.active .pre-order-modal {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--border-gray);
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text-gray);
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
-        }
-
-        .close-modal:hover {
-            background: var(--bg-light);
-            color: var(--text-dark);
-        }
-
-        .time-restriction-banner {
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-            border: 1px solid #ffd43b;
-            border-radius: var(--radius-md);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .time-restriction-banner h4 {
-            color: #856404;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 0.5rem;
-        }
-
-        .time-status {
-            padding: 1rem;
-            border-radius: var(--radius-md);
-            margin-bottom: 1.5rem;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .time-status.open {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .time-status.closed {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid var(--border-gray);
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-        }
-
-        .form-group input[readonly] {
-            background: var(--bg-light);
-            cursor: not-allowed;
-        }
-
-        .time-slots {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 0.75rem;
-        }
-
-        .time-slot {
-            padding: 1rem;
-            border: 2px solid var(--border-gray);
-            border-radius: var(--radius-md);
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            background: white;
-        }
-
-        .time-slot:hover {
-            border-color: var(--primary-blue);
-            background: var(--bg-light);
-        }
-
-        .time-slot.selected {
-            background: var(--primary-blue);
-            border-color: var(--primary-blue);
-            color: white;
-        }
-
-        .time-slot.disabled {
-            background: var(--bg-light);
-            color: var(--text-gray);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .confirm-order-btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--accent-orange);
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 1.125rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .confirm-order-btn:hover:not(:disabled) {
-            background: var(--accent-yellow);
-            color: var(--text-dark);
-        }
-
-        .confirm-order-btn:disabled {
-            background: var(--border-gray);
-            cursor: not-allowed;
-        }
-
-        /* ===== ABOUT SECTION ===== */
-        .about-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        .about-text h2 {
-            color: var(--primary-blue);
-            margin-bottom: 1.5rem;
-            font-size: 2.5rem;
-        }
-
-        .features-list {
-            list-style: none;
-            margin-top: 2rem;
-        }
-
-        .features-list li {
-            padding: 0.75rem 0;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            border-bottom: 1px solid var(--border-gray);
-        }
-
-        .features-list li:last-child {
-            border-bottom: none;
-        }
-
-        .features-list i {
-            color: var(--accent-orange);
-            font-size: 1.25rem;
-            width: 24px;
-        }
-
-        .about-visual {
-            background: linear-gradient(135deg, var(--primary-blue), var(--accent-yellow));
-            border-radius: var(--radius-xl);
-            height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 4rem;
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* ===== CONTACT SECTION ===== */
-        .contact-section {
-            background: var(--bg-light);
-        }
-
-        .contact-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .contact-button {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1.5rem;
-            background: white;
-            border-radius: var(--radius-lg);
-            text-decoration: none;
-            color: var(--text-dark);
-            transition: var(--transition);
-            box-shadow: var(--shadow-md);
-        }
-
-        .contact-button:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-            color: var(--primary-blue);
-        }
-
-        .contact-button i {
-            font-size: 2rem;
-            color: var(--accent-green);
-        }
-
-        /* ===== FOOTER ===== */
-        footer {
-            background: var(--primary-blue);
-            color: white;
-            padding: 3rem 0;
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 2rem;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            color: white;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .social-links a:hover {
-            background: var(--accent-yellow);
-            color: var(--text-dark);
-            transform: translateY(-2px);
-        }
-
-        /* ===== RESPONSIVE DESIGN ===== */
-        @media (max-width: 992px) {
-            .hero h1 {
-                font-size: 2.75rem;
-            }
-            
-            .about-content {
-                grid-template-columns: 1fr;
-                gap: 3rem;
-            }
-            
-            .about-visual {
-                height: 300px;
-                order: -1;
-            }
-        }
-
-        @media (max-width: 768px) {
-            section {
-                padding: 4rem 0;
-            }
-            
-            .hero {
-                padding: 6rem 0 4rem;
-            }
-            
-            .hero h1 {
-                font-size: 2.25rem;
-            }
-            
-            .hamburger {
-                display: block;
-            }
-            
-            .nav-links {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 80%;
-                max-width: 300px;
-                height: 100vh;
-                background: white;
-                flex-direction: column;
-                justify-content: center;
-                padding: 2rem;
-                box-shadow: var(--shadow-lg);
-                transition: var(--transition);
-                z-index: 1000;
-            }
-            
-            .nav-links.active {
-                right: 0;
-            }
-            
-            .menu-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                gap: 1.5rem;
-            }
-            
-            .cart-sidebar {
-                max-width: 100%;
-            }
-            
-            .footer-content {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .hero h1 {
-                font-size: 1.875rem;
-            }
-            
-            .section-title h2 {
-                font-size: 2rem;
-            }
-            
-            .menu-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .countdown-timer {
-                font-size: 2rem;
-            }
-            
-            .category-filters {
-                justify-content: flex-start;
-                overflow-x: auto;
-                padding-bottom: 0.5rem;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            .category-filters::-webkit-scrollbar {
-                display: none;
-            }
-            
-            .cart-item {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .cart-item-controls {
-                justify-content: center;
-            }
-            
-            .time-slots {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* ===== ANIMATIONS ===== */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        .fade-in-delay-1 {
-            animation-delay: 0.2s;
-        }
-
-        .fade-in-delay-2 {
-            animation-delay: 0.4s;
-        }
-
-        /* ===== UTILITY CLASSES ===== */
-        .hidden {
-            display: none !important;
-        }
-
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            background: var(--accent-green);
-            color: white;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-lg);
-            z-index: 4000;
-            animation: slideInRight 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        .swiper-slide {
+            width: auto !important;
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-900 font-sans antialiased">
     <!-- Header -->
-    <header>
-        <div class="container">
-            <nav class="navbar">
-                <a href="#" class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-store-alt"></i>
+    <header class="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+                        <i class="fas fa-utensils text-white text-lg"></i>
                     </div>
-                    <div class="logo-text">
-                        <span class="main">Logaritma Kantin</span>
-                        <span class="sub">Sistem Pre-Order</span>
+                    <div>
+                        <h1 class="font-bold text-lg text-blue-800">LOGIN</h1>
+                        <p class="text-xs text-gray-600">Sistem Pre-Order STMIK TAZKIA</p>
                     </div>
-                </a>
+                </div>
                 
-                <button class="hamburger" id="hamburgerBtn">
-                    <i class="fas fa-bars"></i>
+                <!-- Cart Button -->
+                <button id="cartBtn" class="relative p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" aria-label="Keranjang belanja">
+                    <i class="fas fa-shopping-cart text-gray-700 text-xl"></i>
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
                 </button>
-                
-                <div class="nav-links" id="navLinks">
-                    <a href="#menu">Menu</a>
-                    <a href="#about">Tentang</a>
-                    <a href="#contact">Kontak</a>
-                </div>
-                
-                <div class="nav-actions">
-                    <button class="cart-icon" id="cartIcon">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count" id="cartCount">0</span>
-                    </button>
-                </div>
-            </nav>
+            </div>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div id="particles-js"></div>
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="fade-in">LOGIN (Logaritma Kantin)</h1>
-                <p class="tagline fade-in-delay-1">Akses Mudah untuk Rasa yang Lebih Baik</p>
+    <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-2xl mx-auto">
+                <h1 class="text-2xl md:text-3xl font-bold mb-3 text-center">Logaritma Kantin</h1>
+                <p class="text-blue-100 mb-6 text-center">Pre-Order H-1 untuk pengambilan besok</p>
                 
-                <div class="countdown-wrapper fade-in-delay-1">
-                    <div class="countdown-label" id="countdownLabel">Pre-Order sebelum:</div>
-                    <div class="countdown-status" id="countdownStatus"></div>
-                    <div class="countdown-timer" id="countdownTimer">12:00:00</div>
+                <!-- Countdown -->
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-6">
+                    <p class="text-sm mb-2 text-center">Pre-Order sebelum:</p>
+                    <div id="countdown" class="text-2xl font-bold text-yellow-300 text-center tabular-nums">20:00:00</div>
+                    <p class="text-xs mt-2 text-blue-100 text-center">Jam 20:00 pre-order untuk besok ditutup</p>
                 </div>
 
-                <div class="info-card fade-in-delay-2">
-                    <h3><i class="fas fa-info-circle"></i> Ketentuan Pre-Order</h3>
-                    <ul>
-                        <li>Pre-order hanya bisa dilakukan <strong>HARI INI</strong> untuk pengambilan BESOK</li>
-                        <li>Waktu pre-order: <strong>07:00 - 20:00 WIB</strong> setiap hari</li>
-                        <li>Waktu pengambilan besok: <strong>12:00 - 13:00 WIB</strong></li>
-                        <li>Setelah jam 20:00, pre-order untuk besok sudah ditutup</li>
+                <!-- Info Card -->
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5 mb-6">
+                    <h3 class="font-bold mb-3 flex items-center">
+                        <i class="fas fa-info-circle mr-2 text-yellow-300"></i>
+                        Ketentuan Pre-Order
+                    </h3>
+                    <ul class="space-y-2 text-sm mb-4">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-300 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Pre-order hanya bisa dilakukan <strong>HARI INI</strong> untuk pengambilan BESOK</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-clock text-yellow-300 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Waktu pre-order: <strong>07:00 - 20:00 WIB</strong> setiap hari</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-box text-blue-300 mr-2 mt-0.5 flex-shrink-0"></i>
+                            <span>Waktu pengambilan besok: <strong>12:00 - 13:00 WIB</strong></span>
+                        </li>
                     </ul>
                     
-                    <h3><i class="fas fa-exclamation-triangle"></i> Penting!</h3>
-                    <p>Selalu cek saluran WhatsApp LOGIN Kantin untuk melihat menu yang ready besok. Beberapa menu mungkin tidak tersedia.</p>
-                    
-                    <a href="https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137" target="_blank" class="whatsapp-link">
-                        <i class="fab fa-whatsapp"></i>
+                    <a href="https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="inline-flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors w-full">
+                        <i class="fab fa-whatsapp mr-2"></i>
                         Cek Saluran WhatsApp LOGIN Kantin
                     </a>
                 </div>
 
-                <a href="#menu" class="cta-button fade-in-delay-2">
-                    <i class="fas fa-shopping-basket"></i>
-                    Pre-Order Sekarang
-                </a>
+                <div class="text-center">
+                    <a href="#menu" class="inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                        <i class="fas fa-shopping-basket mr-2"></i>
+                        Pre-Order Sekarang
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Menu Section -->
-    <section class="menu-section" id="menu">
-        <div class="container">
-            <div class="section-title">
-                <h2 class="fade-in">Menu Kami</h2>
-                <p class="fade-in-delay-1">Pilih dari berbagai menu makanan dan minuman yang berkualitas</p>
-            </div>
-
-            <div class="menu-controls fade-in-delay-1">
-                <div class="category-filters" id="categoryFilters">
-                    <button class="category-btn active" data-category="all">Semua</button>
-                    <button class="category-btn" data-category="cemilan">Cemilan</button>
-                    <button class="category-btn" data-category="dessert">Dessert</button>
-                    <button class="category-btn" data-category="makanan">Makanan</button>
-                    <button class="category-btn" data-category="minuman">Minuman</button>
-                </div>
-
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Cari menu...">
-                    <i class="fas fa-search"></i>
-                </div>
-            </div>
-
-            <div class="menu-grid" id="menuGrid">
-                <!-- Menu items akan di-generate oleh JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section class="about-section" id="about">
-        <div class="container">
-            <div class="about-content">
-                <div class="about-text fade-in">
-                    <h2>Tentang LOGIN (Logaritma Kantin)</h2>
-                    <p>Kantin generasi baru STMIK TAZKIA yang menghadirkan pengalaman pre-order modern dengan sistem PO (Pre-Order) H-1.</p>
-                    
-                    <ul class="features-list">
-                        <li>
-                            <i class="fas fa-clock"></i>
-                            <span>Sistem Pre-Order H-1 (07:00 - 20:00)</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-utensils"></i>
-                            <span>Menu berkualitas dengan harga terjangkau</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-truck"></i>
-                            <span>Pengambilan besok jam 12:00 - 13:00</span>
-                        </li>
-                        <li>
-                            <i class="fab fa-whatsapp"></i>
-                            <span>Info menu ready via WhatsApp Channel</span>
-                        </li>
-                        <li>
-                            <i class="fas fa-user-headset"></i>
-                            <span>Admin WhatsApp: Dayana (+62 812-8640-6001)</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="about-visual fade-in-delay-1" style="background: none; overflow: hidden; box-shadow: var(--shadow-lg);">
-                <img src="https://drive.google.com/thumbnail?id=1UImH7jaxhSQ8eC5zAWSfsBIQUv_xIC7Z&sz=w1000" 
-                     alt="LOGIN Kantin STMIK TAZKIA" 
-                     style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-xl); display: block;"
-                     onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\"width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, var(--primary-blue), var(--accent-yellow));color:white;font-size:4rem;border-radius:var(--radius-xl);\"><i class=\"fas fa-store-alt\"></i></div>';">
+    <!-- Search Bar -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="container mx-auto px-4 py-3">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="Cari menu..." 
+                       class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
         </div>
     </div>
-</section>
+
+    <!-- Category Swiper -->
+    <section class="bg-white border-b border-gray-200" id="menu">
+        <div class="container mx-auto">
+            <div class="swiper-container">
+                <div class="swiper-wrapper py-3" id="categorySwiper" role="tablist">
+                    <!-- Categories will be populated by JS -->
+                </div>
+                <div class="swiper-scrollbar mt-2"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Grid -->
+    <main class="container mx-auto px-4 py-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="menuGrid">
+            <!-- Menu items will be populated by JS -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-search text-gray-400 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-700 mb-2">Menu tidak ditemukan</h3>
+            <p class="text-gray-500">Coba kategori lain atau kata kunci berbeda</p>
+        </div>
+    </main>
 
     <!-- Contact Section -->
-    <section class="contact-section" id="contact">
-        <div class="container">
-            <div class="section-title">
-                <h2 class="fade-in">Kontak Kami</h2>
-                <p class="fade-in-delay-1">Butuh bantuan atau ada pertanyaan? Hubungi kami</p>
-            </div>
+    <section class="bg-gray-50 border-t border-gray-200 py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Kontak & Informasi</h2>
             
-            <div class="contact-buttons fade-in-delay-1">
-                <a href="https://wa.me/6281286406001" target="_blank" class="contact-button">
-                    <i class="fab fa-whatsapp"></i>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                <a href="https://wa.me/6281286406001" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fab fa-whatsapp text-green-600 text-xl"></i>
+                    </div>
                     <div>
-                        <strong>WhatsApp Admin</strong>
-                        <small>Dayana (+62 812-8640-6001)</small>
+                        <h3 class="font-bold text-gray-800">WhatsApp Admin</h3>
+                        <p class="text-sm text-gray-600 mt-1">Dayana (+62 812-8640-6001)</p>
                     </div>
                 </a>
-                <a href="https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137" target="_blank" class="contact-button">
-                    <i class="fab fa-whatsapp"></i>
+                
+                <a href="https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fab fa-whatsapp text-green-600 text-xl"></i>
+                    </div>
                     <div>
-                        <strong>WhatsApp Channel</strong>
-                        <small>Update Menu & Info Terbaru</small>
+                        <h3 class="font-bold text-gray-800">WhatsApp Channel</h3>
+                        <p class="text-sm text-gray-600 mt-1">Update Menu & Info Terbaru</p>
                     </div>
                 </a>
             </div>
@@ -1430,27 +250,28 @@
     </section>
 
     <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <div class="logo-icon" style="background: white; color: var(--primary-blue);">
-                        <i class="fas fa-store-alt"></i>
+    <footer class="bg-blue-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center space-x-3 mb-3">
                     </div>
+                    <p class="text-sm text-blue-200">&copy; 2025 LOGIN (Logaritma Kantin). All rights reserved.</p>
                 </div>
                 
-                <div class="footer-info">
-                    <p>&copy; 2025 LOGIN (Logaritma Kantin). All rights reserved.</p>
-                    <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
-                        Sistem Pre-Order LOGIN STMIK TAZKIA
-                    </p>
-                </div>
-                
-                <div class="social-links">
-                    <a href="https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137" target="_blank" title="WhatsApp Channel">
+                <div class="flex space-x-4">
+                    <a href="https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                       aria-label="WhatsApp Channel">
                         <i class="fab fa-whatsapp"></i>
                     </a>
-                    <a href="https://www.instagram.com/p/DO-4cI9ibgv/">
+                    <a href="https://www.instagram.com/p/DO-4cI9ibgv/" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                       aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
                     </a>
                 </div>
@@ -1458,510 +279,399 @@
         </div>
     </footer>
 
-    <!-- Cart Sidebar -->
-    <div class="cart-overlay" id="cartOverlay"></div>
-    <div class="cart-sidebar" id="cartSidebar">
-        <div class="cart-header">
-            <h3>Keranjang Pre-Order</h3>
-            <button class="close-cart" id="closeCart">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="cart-items" id="cartItems">
-            <!-- Cart items akan di-generate oleh JavaScript -->
-        </div>
-        <div class="cart-total">
-            <div class="total-row">
-                <span>Total:</span>
-                <span id="cartTotal">Rp 0</span>
-            </div>
-            <button class="checkout-btn" id="checkoutBtn">
-                <i class="fas fa-shopping-basket"></i>
-                Lanjut Pre-Order
-            </button>
-        </div>
-    </div>
+    <!-- Floating Cart Button -->
+    <button id="floatingCartBtn" 
+            class="fixed bottom-6 right-4 z-40 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            aria-label="Buka keranjang">
+        <i class="fas fa-shopping-cart text-xl"></i>
+        <span id="floatingCartCount" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+    </button>
 
-    <!-- Pre-order Modal -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="pre-order-modal">
-            <div class="modal-header">
-                <h3>Konfirmasi Pre-Order</h3>
-                <button class="close-modal" id="closeModal">
-                    <i class="fas fa-times"></i>
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="fixed inset-0 z-50 hidden" aria-hidden="true">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="cartOverlay"></div>
+        <div class="absolute inset-y-0 right-0 w-full max-w-md bg-white flex flex-col slide-in" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+            <!-- Cart Header -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <h2 id="cartTitle" class="text-xl font-bold">Keranjang Pre-Order</h2>
+                <button id="closeCart" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    <i class="fas fa-times text-gray-600 text-lg"></i>
                 </button>
             </div>
             
-            <div class="time-restriction-banner">
-                <h4><i class="fas fa-clock"></i> Waktu Pre-Order Terbatas</h4>
-                <p>Pre-order hanya bisa dilakukan <strong>07:00 - 20:00</strong> untuk pengambilan besok jam 12:00 - 13:00. Di luar jam tersebut, pre-order ditutup.</p>
-            </div>
-            
-            <div class="time-status" id="currentTimeStatus">
-                <!-- Status akan diisi oleh JavaScript -->
-            </div>
-
-            <div class="form-group">
-                <label for="orderDate">Tanggal Pengambilan:</label>
-                <input type="date" id="orderDate" readonly>
-                <small style="color: var(--text-gray); display: block; margin-top: 5px;">
-                    <!-- Text akan diupdate oleh JavaScript -->
-                </small>
-            </div>
-
-            <div class="form-group">
-                <label>Pilih Waktu Pengambilan (Besok):</label>
-                <div class="time-slots">
-                    <div class="time-slot selected" data-time="12:00">12:00</div>
-                    <div class="time-slot" data-time="13:00">13:00</div>
+            <!-- Cart Items -->
+            <div class="flex-1 overflow-y-auto p-4" id="cartItems">
+                <div class="text-center py-12 text-gray-500">
+                    <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shopping-cart text-gray-300 text-2xl"></i>
+                    </div>
+                    <p class="mb-2">Keranjang masih kosong</p>
+                    <p class="text-sm text-gray-400">Tambahkan menu favorit Anda</p>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label for="instructions">Instruksi Khusus (optional):</label>
-                <textarea id="instructions" placeholder="Contoh: Level pedas, tanpa bawang, dll..." rows="3"></textarea>
-            </div>
-
-            <button class="confirm-order-btn" id="confirmOrderBtn" disabled>
-                <i class="fas fa-paper-plane"></i>
-                Konfirmasi Pre-Order
-            </button>
             
-            <div style="text-align: center; margin-top: 1rem;">
-                <a href="https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137" target="_blank" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem;">
-                    <i class="fab fa-whatsapp"></i> Cek menu ready besok di WhatsApp Channel
-                </a>
+            <!-- Cart Footer -->
+            <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="font-medium">Total:</span>
+                    <span id="cartTotal" class="text-xl font-bold text-blue-600">Rp 0</span>
+                </div>
+                <button id="checkoutBtn" 
+                        class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                        disabled>
+                    <i class="fas fa-whatsapp mr-2"></i>
+                    Lanjut ke WhatsApp
+                </button>
+                <p class="text-xs text-gray-500 mt-3 text-center">
+                    Pre-order akan dikirim ke WhatsApp Admin untuk konfirmasi
+                </p>
             </div>
         </div>
     </div>
 
+    <!-- Menu Detail Modal -->
+    <div id="menuModal" class="fixed inset-0 z-50 hidden" aria-hidden="true">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="menuModalOverlay"></div>
+        <div class="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl max-h-[90vh] overflow-y-auto fade-in" role="dialog" aria-modal="true">
+            <!-- Modal content will be populated by JS -->
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 hidden" aria-hidden="true">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="checkoutOverlay"></div>
+        <div class="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl max-h-[90vh] overflow-y-auto fade-in" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+            <div class="p-6">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <h2 id="checkoutTitle" class="text-xl font-bold">Konfirmasi Pre-Order</h2>
+                    <button id="closeCheckoutModal" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        <i class="fas fa-times text-gray-600 text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Time Status -->
+                <div id="timeStatusBanner" class="mb-6 p-4 rounded-lg bg-yellow-50 border border-yellow-200">
+                    <div class="flex items-start">
+                        <i class="fas fa-clock text-yellow-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <div>
+                            <h4 class="font-medium text-yellow-800">Waktu Pre-Order Terbatas</h4>
+                            <p class="text-sm text-yellow-700 mt-1">Pre-order hanya bisa dilakukan <strong>07:00 - 20:00</strong> untuk pengambilan besok</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Status -->
+                <div id="currentTimeStatus" class="mb-6 p-4 rounded-lg">
+                    <!-- Filled by JS -->
+                </div>
+
+                <!-- Form -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="orderDate" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengambilan</label>
+                        <input type="date" 
+                               id="orderDate" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                               readonly
+                               aria-describedby="orderDateHelp">
+                        <p id="orderDateHelp" class="text-sm text-gray-500 mt-1"></p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Waktu Pengambilan</label>
+                        <div class="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Pilih waktu pengambilan">
+                            <button type="button" 
+                                    class="time-slot-btn py-3 border-2 border-blue-500 bg-blue-50 text-blue-700 font-medium rounded-lg time-slot-selected focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    data-time="12:00"
+                                    role="radio"
+                                    aria-checked="true">
+                                12:00 WIB
+                            </button>
+                            <button type="button" 
+                                    class="time-slot-btn py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    data-time="13:00"
+                                    role="radio"
+                                    aria-checked="false">
+                                13:00 WIB
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="orderNotes" class="block text-sm font-medium text-gray-700 mb-1">Catatan (opsional)</label>
+                        <textarea id="orderNotes" 
+                                  rows="3" 
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                  placeholder="Contoh: Level pedas, tanpa bawang, dll..."></textarea>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-200">
+                        <button id="confirmOrderBtn" 
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                disabled>
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Kirim Pre-Order via WhatsApp
+                        </button>
+                        <p class="text-xs text-center mt-3">
+                            <a href="https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="text-blue-600 hover:underline inline-flex items-center">
+                                <i class="fab fa-whatsapp mr-1"></i> Cek menu ready besok di WhatsApp Channel
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" 
+         class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50 hidden fade-in max-w-xs"
+         role="alert"
+         aria-live="polite">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2 text-green-400"></i>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // ===== KONFIGURASI =====
+        // ===== GLOBAL ERROR HANDLER FOR IMAGES =====
+        function handleImgError(img) {
+            img.style.display = 'none';
+            const wrapper = document.createElement('div');
+            wrapper.className = 'w-full h-full flex items-center justify-center text-gray-400';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-utensils text-xl';
+            wrapper.appendChild(icon);
+            img.parentElement.replaceChildren(wrapper);
+        }
+
+        // ===== CONFIGURATION =====
         const CONFIG = {
-            PRE_ORDER_START_HOUR: 7,
-            PRE_ORDER_END_HOUR: 20,
-            PICKUP_START_HOUR: 12,
-            PICKUP_END_HOUR: 13,
-            ADMIN_WHATSAPP: "6281286406001",
-            WHATSAPP_CHANNEL: "https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137"
+            PRE_ORDER_START: 7,
+            PRE_ORDER_END: 20,
+            PICKUP_START: 12,
+            PICKUP_END: 13,
+            ADMIN_PHONE: '6281286406001',
+            CHANNEL_URL: 'https://whatsapp.com/channel/0029VbBNjsgAjPXKsfU20137'
         };
 
-        // ===== DATA MENU REAL =====
+        // ===== STATE =====
+        let state = {
+            cart: JSON.parse(localStorage.getItem('loginKantinCart')) || [],
+            currentCategory: 'all',
+            searchQuery: '',
+            selectedTime: '12:00',
+            swiper: null
+        };
+
+        // ===== MENU DATA (TETAP SAMA PERSIS) =====
         const MENU_DATA = [
             // === CEMILAN ===
-            {
-                id: 1,
-                name: "Pizza Mini",
-                price: 10000,
-                category: "cemilan",
-                description: "Pizza ukuran mini dengan topping sosis, keju, saus tomat, dan oregano. Dibalut roti lembut dan gurih.",
-                details: "3 pcs pizza mini",
-                image: "https://drive.google.com/thumbnail?id=1QV9gJdBz1iVXEbCSGGA5das658qPNe9U&sz=w1000"
-            },
-            {
-                id: 2,
-                name: "Onde-onde",
-                price: 10000,
-                category: "cemilan",
-                description: "Camilan tradisional dilapisi wijen dengan isian kacang hijau kupas lembut di dalam.",
-                details: "4 pcs onde-onde",
-                image: "https://drive.google.com/thumbnail?id=1A1tpeFq6YZb-Kv8gm_vrYtU3GWBA1OOX&sz=w1000"
-            },
-            {
-                id: 3,
-                name: "Cireng Isi",
-                price: 8000,
-                category: "cemilan",
-                description: "Cireng yg diberi isian suwiran ayam yg sudah di masak dengan bumbu.",
-                details: "Rasa original/pedas (menggunakan box untuk snack)",
-                image: "https://drive.google.com/thumbnail?id=1Nbb8sxOuY8aIyLeXITzP5KjXFoPp_6Ta&sz=w1000"
-            },
-            {
-                id: 4,
-                name: "Tahu Isi (pedas)",
-                price: 6000,
-                category: "cemilan",
-                description: "Tahu yg di beri isian sayuran seperti wortel dan toge yg telah di tumis pedas kemudian dibaluri tepung dan di goreng.",
-                details: "4pcs tahu isi pedas (pakai box coklat untuk snack)",
-                image: "https://drive.google.com/thumbnail?id=1NJYNr-R0r8myRvbQVeGcmTC1y-0Qy7AN&sz=w1000"
-            },
-            {
-                id: 5,
-                name: "Kue Bugis",
-                price: 8000,
-                category: "cemilan",
-                description: "Kue yg memiliki tekstur lembut dan rasa manis, dengan isi kelapa parut dan gula merah.",
-                details: "4 pcs kue bugis",
-                image: "https://drive.google.com/thumbnail?id=1DVnlK_vfioAQyhhtOh19Rwahwv_fOYN4&sz=w1000"
-            },
-            {
-                id: 6,
-                name: "Keripik Pisang",
-                price: 15000,
-                category: "cemilan",
-                description: "Keripik pisang dengan varian rasa (coklat, matcha, tiramisu, strawberry)",
-                details: "Rasa bisa request saat pemesanan",
-                image: "https://drive.google.com/thumbnail?id=1DaIcnmH7mYmJLZptCu_hjty0PleWL2cn&sz=w1000"
-            },
-            {
-                id: 7,
-                name: "Risol Mayo",
-                price: 10000,
-                category: "cemilan",
-                description: "Risoles berisi smoked beef, telur, dan mayonaise dengan kulit renyah di luar dan isian creamy di dalam.",
-                details: "3 pcs risol",
-                image: "https://drive.google.com/thumbnail?id=18wGz2hMyPrDVUpGapmBBwFsJMwYcoEnn&sz=w1000"
-            },
-            {
-                id: 8,
-                name: "Donat Isi",
-                price: 10000,
-                category: "cemilan",
-                description: "Donat empuk dengan topping atau isian seperti coklat, strawberry, blueberry. Cocok buat cemilan.",
-                details: "3 pcs donat, varian rasa bisa request saat pemesanan",
-                image: "https://drive.google.com/thumbnail?id=1q6tLcJW1buEamVuweSlY75Mvn1le7kL9&sz=w1000"
-            },
-            {
-                id: 9,
-                name: "Martabak Telur",
-                price: 8000,
-                category: "cemilan",
-                description: "Roti tipis dengan isian telur, daun bawang, dan mie s, digoreng dengan minyak.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=19GcSQJ7u_b53R3KzVJDcZYnqkjrwnST8&sz=w1000"
-            },
-            {
-                id: 10,
-                name: "MakLor (Makaroni Telor)",
-                price: 8000,
-                category: "cemilan",
-                description: "Makaroni dengan telur goreng, sayuran, dan bumbu kecap manis.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1VSrK1Ax3bt44arvXSDjIKrxLLhcFLq92&sz=w1000"
-            },
-            {
-                id: 11,
-                name: "Basreng Pedas Daun Jeruk",
-                price: 5000,
-                category: "cemilan",
-                description: "Basreng Yang Menyandu",
-                details: "Dapet 2 pcs",
-                image: "https://drive.google.com/thumbnail?id=1Lv_gH9fQ3pXH3_iC0pfz1-X5UIE0STWL&sz=w1000"
-            },
-            {
-                id: 12,
-                name: "Keripik kaca Pedas daun Jeruk",
-                price: 5000,
-                category: "cemilan",
-                description: "Sama candunya seperti Basreng pedas daun jeruk",
-                details: "Dapet 2 pcs",
-                image: "https://drive.google.com/thumbnail?id=1jldFuAC3O-AHrj30g_UlJTPXkLhpdwEo&sz=w1000"
-            },
-            {
-                id: 13,
-                name: "Cireng Isi Ati Ampela",
-                price: 6000,
-                category: "cemilan",
-                description: "Cireng unik dengan isian ati ampela yang gurih dan wangi. Rasa khas yang bikin beda dari cireng biasa.",
-                details: "Isi 4",
-                image: "https://drive.google.com/thumbnail?id=17tDpBwXWOWZB3dpGiucwZa0qjizBkLPh&sz=w1000"
-            },
-            {
-                id: 14,
-                name: "Cibay",
-                price: 6000,
-                category: "cemilan",
-                description: "Cilor gaya Bandung yang crispy di luar dan lumer di dalam. Pedas-gurihnya pas, cocok buat teman nongkrong.",
-                details: "Isi 4",
-                image: "https://drive.google.com/thumbnail?id=1RcN9S3RsQrerrFVOig8a2TFDXgcQHuFj&sz=w1000"
-            },
-            {
-                id: 15,
-                name: "Cireng Rujak",
-                price: 7000,
-                category: "cemilan",
-                description: "Cireng kenyal satu paket isi 10, disajikan dengan sambal rujak pedas-manis yang segar. Favorit semua kalangan.",
-                details: "Isi 10",
-                image: "https://drive.google.com/thumbnail?id=1QZcGHZAKL2R1ctLXJwSpnkS0WS94p7X9&sz=w1000"
-            },
+            {id: 1, name: "Pizza Mini", price: 10000, category: "cemilan", description: "Pizza ukuran mini dengan topping sosis, keju, saus tomat, dan oregano. Dibalut roti lembut dan gurih.", details: "3 pcs pizza mini", image: "https://drive.google.com/thumbnail?id=1QV9gJdBz1iVXEbCSGGA5das658qPNe9U&sz=w1000"},
+            {id: 2, name: "Onde-onde", price: 10000, category: "cemilan", description: "Camilan tradisional dilapisi wijen dengan isian kacang hijau kupas lembut di dalam.", details: "4 pcs onde-onde", image: "https://drive.google.com/thumbnail?id=1A1tpeFq6YZb-Kv8gm_vrYtU3GWBA1OOX&sz=w1000"},
+            {id: 3, name: "Cireng Isi", price: 8000, category: "cemilan", description: "Cireng yg diberi isian suwiran ayam yg sudah di masak dengan bumbu.", details: "Rasa original/pedas (menggunakan box untuk snack)", image: "https://drive.google.com/thumbnail?id=1Nbb8sxOuY8aIyLeXITzP5KjXFoPp_6Ta&sz=w1000"},
+            {id: 4, name: "Tahu Isi (pedas)", price: 6000, category: "cemilan", description: "Tahu yg di beri isian sayuran seperti wortel dan toge yg telah ditumis pedas kemudian dibaluri tepung dan di goreng.", details: "4pcs tahu isi pedas (pakai box coklat untuk snack)", image: "https://drive.google.com/thumbnail?id=1NJYNr-R0r8myRvbQVeGcmTC1y-0Qy7AN&sz=w1000"},
+            {id: 5, name: "Kue Bugis", price: 8000, category: "cemilan", description: "Kue yg memiliki tekstur lembut dan rasa manis, dengan isi kelapa parut dan gula merah.", details: "4 pcs kue bugis", image: "https://drive.google.com/thumbnail?id=1DVnlK_vfioAQyhhtOh19Rwahwv_fOYN4&sz=w1000"},
+            {id: 6, name: "Keripik Pisang", price: 15000, category: "cemilan", description: "Keripik pisang dengan varian rasa (coklat, matcha, tiramisu, strawberry)", details: "Rasa bisa request saat pemesanan", image: "https://drive.google.com/thumbnail?id=1DaIcnmH7mYmJLZptCu_hjty0PleWL2cn&sz=w1000"},
+            {id: 7, name: "Risol Mayo", price: 10000, category: "cemilan", description: "Risoles berisi smoked beef, telur, dan mayonaise dengan kulit renyah di luar dan isian creamy di dalam.", details: "3 pcs risol", image: "https://drive.google.com/thumbnail?id=18wGz2hMyPrDVUpGapmBBwFsJMwYcoEnn&sz=w1000"},
+            {id: 8, name: "Donat Isi", price: 10000, category: "cemilan", description: "Donat empuk dengan topping atau isian seperti coklat, strawberry, blueberry. Cocok buat cemilan.", details: "3 pcs donat, varian rasa bisa request saat pemesanan", image: "https://drive.google.com/thumbnail?id=1q6tLcJW1buEamVuweSlY75Mvn1le7kL9&sz=w1000"},
+            {id: 9, name: "Martabak Telur", price: 8000, category: "cemilan", description: "Roti tipis dengan isian telur, daun bawang, dan mie, digoreng dengan minyak.", details: "", image: "https://drive.google.com/thumbnail?id=19GcSQJ7u_b53R3KzVJDcZYnqkjrwnST8&sz=w1000"},
+            {id: 10, name: "MakLor (Makaroni Telor)", price: 8000, category: "cemilan", description: "Makaroni dengan telur goreng, sayuran, dan bumbu kecap manis.", details: "", image: "https://drive.google.com/thumbnail?id=1VSrK1Ax3bt44arvXSDjIKrxLLhcFLq92&sz=w1000"},
+            {id: 11, name: "Basreng Pedas Daun Jeruk", price: 5000, category: "cemilan", description: "Basreng Yang Menyandu", details: "Dapet 2 pcs", image: "https://drive.google.com/thumbnail?id=1Lv_gH9fQ3pXH3_iC0pfz1-X5UIE0STWL&sz=w1000"},
+            {id: 12, name: "Keripik kaca Pedas daun Jeruk", price: 5000, category: "cemilan", description: "Sama candunya seperti Basreng pedas daun jeruk", details: "Dapet 2 pcs", image: "https://drive.google.com/thumbnail?id=1jldFuAC3O-AHrj30g_UlJTPXkLhpdwEo&sz=w1000"},
+            {id: 13, name: "Cireng Isi Ati Ampela", price: 6000, category: "cemilan", description: "Cireng unik dengan isian ati ampela yang gurih dan wangi. Rasa khas yang bikin beda dari cireng biasa.", details: "Isi 4", image: "https://drive.google.com/thumbnail?id=17tDpBwXWOWZB3dpGiucwZa0qjizBkLPh&sz=w1000"},
+            {id: 14, name: "Cibay", price: 6000, category: "cemilan", description: "Cilor gaya Bandung yang crispy di luar dan lumer di dalam. Pedas-gurihnya pas, cocok buat teman nongkrong.", details: "Isi 4", image: "https://drive.google.com/thumbnail?id=1RcN9S3RsQrerrFVOig8a2TFDXgcQHuFj&sz=w1000"},
+            {id: 15, name: "Cireng Rujak", price: 7000, category: "cemilan", description: "Cireng kenyal satu paket isi 10, disajikan dengan sambal rujak pedas-manis yang segar. Favorit semua kalangan.", details: "Isi 10", image: "https://drive.google.com/thumbnail?id=1QZcGHZAKL2R1ctLXJwSpnkS0WS94p7X9&sz=w1000"},
 
             // === DESSERT ===
-            {
-                id: 16,
-                name: "Brownies (10x10 cm)",
-                price: 25000,
-                category: "dessert",
-                description: "Selamat datang di surga para pecinta cokelat! Brownies kami memiliki tekstur fudgy yang padat di dalam, dan permukaan shiny crust yang renyah di luar. Dibuat dengan cokelat premium yang menghasilkan rasa pahit manis yang intens. Satu gigitan, langsung lupa diet!",
-                details: "Ukuran 10x10 cm",
-                image: "https://drive.google.com/thumbnail?id=1gfdNrrhWlkkxnq9D2RD4JGTBLLMnTTIL&sz=w1000"
-            },
-            {
-                id: 17,
-                name: "Brownies (20x10 cm)",
-                price: 45000,
-                category: "dessert",
-                description: "Selamat datang di surga para pecinta cokelat! Brownies kami memiliki tekstur fudgy yang padat di dalam, dan permukaan shiny crust yang renyah di luar. Dibuat dengan cokelat premium yang menghasilkan rasa pahit manis yang intens.",
-                details: "Ukuran 20x10 cm",
-                image: "https://drive.google.com/thumbnail?id=1pnGV9eb8XQyMJtYchDwHnLXJqDmiH02Z&sz=w1000"
-            },
-            {
-                id: 18,
-                name: "Brownies (20x20 cm)",
-                price: 90000,
-                category: "dessert",
-                description: "Selamat datang di surga para pecinta cokelat! Brownies kami memiliki tekstur fudgy yang padat di dalam, dan permukaan shiny crust yang renyah di luar. Dibuat dengan cokelat premium yang menghasilkan rasa pahit manis yang intens.",
-                details: "Ukuran 20x20 cm",
-                image: "https://drive.google.com/thumbnail?id=1Q1MCNNrgCtVtgDW3qTGmBpOijzfccj7n&sz=w1000"
-            },
-            {
-                id: 19,
-                name: "Piscok Siram Coklat Lumer",
-                price: 8000,
-                category: "dessert",
-                description: "Makanan yg terbuat dari pisang yg dibungkus kulit lumpia kemudian di isi dengan coklat leleh.",
-                details: "4 pcs piscok",
-                image: "https://drive.google.com/thumbnail?id=1-QSYjZj42hj_hfKkZvZzPRKs6lvYXDXj&sz=w1000"
-            },
-            {
-                id: 20,
-                name: "Pisang Krispi",
-                price: 8000,
-                category: "dessert",
-                description: "Cemilan dari pisang yg digoreng dengan tepung panir yg di beri lelehan coklat dan keju parut di atas nya.",
-                details: "4 pcs",
-                image: "https://drive.google.com/thumbnail?id=14O68_S7nDxOXMLAn1E9rULgI2P3HpmAE&sz=w1000"
-            },
-            {
-                id: 21,
-                name: "Salad Buah",
-                price: 8000,
-                category: "dessert",
-                description: "Dessert sehat yg terbuat dari potongan buah dengan kuah mayones dan parutan keju diatasnya.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1Te7Dq6t4eJafcQknjz8-v5rVSdm6kLmd&sz=w1000"
-            },
-            {
-                id: 22,
-                name: "Mochi",
-                price: 3000,
-                category: "dessert",
-                description: "Camilan lembut dan kenyal dengan isian manis yang lumer di mulut. Teksturnya halus, rasa manisnya pas, cocok buat pencuci mulut setelah makan pedas.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1idniT4ZF7TbIoFB89BQCQl2o8M6ce8QK&sz=w1000"
-            },
+            {id: 16, name: "Brownies (10x10 cm)", price: 25000, category: "dessert", description: "Selamat datang di surga para pecinta cokelat! Brownies kami memiliki tekstur fudgy yang padat di dalam, dan permukaan shiny crust yang renyah di luar. Dibuat dengan cokelat premium yang menghasilkan rasa pahit manis yang intens. Satu gigitan, langsung lupa diet!", details: "Ukuran 10x10 cm", image: "https://drive.google.com/thumbnail?id=1gfdNrrhWlkkxnq9D2RD4JGTBLLMnTTIL&sz=w1000"},
+            {id: 17, name: "Brownies (20x10 cm)", price: 45000, category: "dessert", description: "Selamat datang di surga para pecinta cokelat! Brownies kami memiliki tekstur fudgy yang padat di dalam, dan permukaan shiny crust yang renyah di luar. Dibuat dengan cokelat premium yang menghasilkan rasa pahit manis yang intens.", details: "Ukuran 20x10 cm", image: "https://drive.google.com/thumbnail?id=1pnGV9eb8XQyMJtYchDwHnLXJqDmiH02Z&sz=w1000"},
+            {id: 18, name: "Brownies (20x20 cm)", price: 90000, category: "dessert", description: "Selamat datang di surga para pecinta cokelat! Brownies kami memiliki tekstur fudgy yang padat di dalam, dan permukaan shiny crust yang renyah di luar. Dibuat dengan cokelat premium yang menghasilkan rasa pahit manis yang intens.", details: "Ukuran 20x20 cm", image: "https://drive.google.com/thumbnail?id=1Q1MCNNrgCtVtgDW3qTGmBpOijzfccj7n&sz=w1000"},
+            {id: 19, name: "Piscok Siram Coklat Lumer", price: 8000, category: "dessert", description: "Makanan yg terbuat dari pisang yg dibungkus kulit lumpia kemudian di isi dengan coklat leleh.", details: "4 pcs piscok", image: "https://drive.google.com/thumbnail?id=1-QSYjZj42hj_hfKkZvZzPRKs6lvYXDXj&sz=w1000"},
+            {id: 20, name: "Pisang Krispi", price: 8000, category: "dessert", description: "Cemilan dari pisang yg digoreng dengan tepung panir yg di beri lelehan coklat dan keju parut di atas nya.", details: "4 pcs", image: "https://drive.google.com/thumbnail?id=14O68_S7nDxOXMLAn1E9rULgI2P3HpmAE&sz=w1000"},
+            {id: 21, name: "Salad Buah", price: 8000, category: "dessert", description: "Dessert sehat yg terbuat dari potongan buah dengan kuah mayones dan parutan keju diatasnya.", details: "", image: "https://drive.google.com/thumbnail?id=1Te7Dq6t4eJafcQknjz8-v5rVSdm6kLmd&sz=w1000"},
+            {id: 22, name: "Mochi", price: 3000, category: "dessert", description: "Camilan lembut dan kenyal dengan isian manis yang lumer di mulut. Teksturnya halus, rasa manisnya pas, cocok buat pencuci mulut setelah makan pedas.", details: "", image: "https://drive.google.com/thumbnail?id=1idniT4ZF7TbIoFB89BQCQl2o8M6ce8QK&sz=w1000"},
 
             // === MAKANAN ===
-            {
-                id: 23,
-                name: "Nasi Bakar Ayam",
-                price: 12000,
-                category: "makanan",
-                description: "Nasi putih hangat dengan ayam bakar bumbu manis pedas, dilengkapi lalapan, dan sambal.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1EZem9UePajvVyZCwXUYu0yenC0ZGTntF&sz=w1000"
-            },
-            {
-                id: 24,
-                name: "Tiauw Goreng",
-                price: 12000,
-                category: "makanan",
-                description: "Tiaw goreng dengan aroma smoky yang khas Teksturnya lembut tapi tetap kenyal, dipadu bumbu gurih yang meresap. Dilengkapi topping toping yang nikmat membuat Rasanya mantap, porsinya ngenyangin, dan cocok buat pecinta mie-lebar yang wangi banget.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=10efN-G8-0fMBS1P4b9Pvml5OPPQhXIlT&sz=w1000"
-            },
-            {
-                id: 25,
-                name: "Nasi Goreng",
-                price: 13000,
-                category: "makanan",
-                description: "Nasi goreng dengan sayuran,dan telur, disiram kecap manis.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1xyw_PzCj25McfPJoE9Yslp6J_j3bXEpJ&sz=w1000"
-            },
-            {
-                id: 26,
-                name: "Mie Jebew",
-                price: 13000,
-                category: "makanan",
-                description: "Mie kuning dengan sayuran dan daging ayam, disiram kuah pedas.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1BGhnPQZpgD3c7v119EgrHZPV4SqnOlz8&sz=w1000"
-            },
-            {
-                id: 27,
-                name: "Paket Ayam Geprek",
-                price: 16000,
-                category: "makanan",
-                description: "Ayam goreng Kentucky (Pilih Bagiannya), Nasi putih, Lalap kol dan timun, saus abc stik, sambal geprek",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1VSrK1Ax3bt44arvXSDjIKrxLLhcFLq92&sz=w1000"
-            },
-            {
-                id: 28,
-                name: "Kebab",
-                price: 10000,
-                category: "makanan",
-                description: "Rasakan perpaduan sempurna daging premium yang dipanggang perlahan hingga juicy, dibalut tortilla lembut, dan disempurnakan dengan irisan sayuran segar dan saus spesial yang kaya rasa. Setiap gigitan adalah petualangan rasa yang nendang dan bikin ketagihan!",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1ijbGNh4CmNlQFkk31wVcERpxP1YmsJZl&sz=w1000"
-            },
-            {
-                id: 29,
-                name: "Nasi Cumi Pedas",
-                price: 13000,
-                category: "makanan",
-                description: "Nasi cumi pedas + telur, pedasnya membangkitkan semangat🔥",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1cdxizUzpGZLfTpq1acIAjKTTdnYQa5sA&sz=w1000"
-            },
-            {
-                id: 30,
-                name: "Mercon Baso, Otak-otak, Ceker",
-                price: 12000,
-                category: "makanan",
-                description: "Paket pedas nagih berisi baso kenyal, otak-otak gurih, dan ceker empuk. Bumbu mercon-nya nendang, cocok buat pecinta pedas level dewa.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1HXj73a5nmvszIwXyhAYvoS8NjI2KWx7Y&sz=w1000"
-            },
-            {
-                id: 31,
-                name: "Mercon Full Ceker",
-                price: 10000,
-                category: "makanan",
-                description: "Satu porsi penuh ceker lembut yang disiram bumbu mercon pedas mantap. Murah, rame, dan bikin keringetan puas.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1HXj73a5nmvszIwXyhAYvoS8NjI2KWx7Y&sz=w1000"
-            },
-            {
-                id: 32,
-                name: "Baso Taichan Mix",
-                price: 12000,
-                category: "makanan",
-                description: "Baso taichan dengan cita rasa smoky pedas segar khas taichan. Isian lengkap, tekstur kenyal, dan rasa gurih yang bikin nambah.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1kPoQWPuv0uG6jR70Wco-YaysQvstmZWL&sz=w1000"
-            },
-            {
-                id: 33,
-                name: "Boci Ayam Suwir",
-                price: 10000,
-                category: "makanan",
-                description: "Bola aci besar berisi ayam suwir berbumbu gurih pedas. Kenyalnya pas, topping-nya melimpah.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1sZT_ZiOrkVvAM5ELX0hsaQZ5HAXj6ieZ&sz=w1000"
-            },
-            {
-                id: 34,
-                name: "Boci Isi Baso",
-                price: 7000,
-                category: "makanan",
-                description: "Baso aci kenyal yang diisi baso kecil. Kombinasi gurih dan pedas yang bikin susah berhenti makan.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1sZT_ZiOrkVvAM5ELX0hsaQZ5HAXj6ieZ&sz=w1000"
-            },
-            {
-                id: 35,
-                name: "Boci Ori",
-                price: 7000,
-                category: "makanan",
-                description: "Boci klasik tanpa isian. Simpel, kenyal, dan cocok dimakan pakai sambal pedas biar lebih nendang.",
-                details: "Isi 2",
-                image: "https://drive.google.com/thumbnail?id=1sZT_ZiOrkVvAM5ELX0hsaQZ5HAXj6ieZ&sz=w1000"
-            },
-            {
-                id: 36,
-                name: "Chicken Wings",
-                price: 7000,
-                category: "makanan",
-                description: "Sayap ayam crispy dengan bumbu gurih pedas yang meresap sampai ke dalam. Bisa pilih saus—manis, pedas, atau BBQ. Juicy, wangi, dan bikin pengen nambah terus.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1vVBOFf-kltj81GPivZpOByqf91a3SBC2&sz=w1000"
-            },
+            {id: 23, name: "Nasi Bakar Ayam", price: 12000, category: "makanan", description: "Nasi putih hangat dengan ayam bakar bumbu manis pedas, dilengkapi lalapan, dan sambal.", details: "", image: "https://drive.google.com/thumbnail?id=1EZem9UePajvVyZCwXUYu0yenC0ZGTntF&sz=w1000"},
+            {id: 24, name: "Tiauw Goreng", price: 12000, category: "makanan", description: "Tiaw goreng dengan aroma smoky yang khas Teksturnya lembut tapi tetap kenyal, dipadu bumbu gurih yang meresap. Dilengkapi topping toping yang nikmat membuat Rasanya mantap, porsinya ngenyangin, dan cocok buat pecinta mie-lebar yang wangi banget.", details: "", image: "https://drive.google.com/thumbnail?id=10efN-G8-0fMBS1P4b9Pvml5OPPQhXIlT&sz=w1000"},
+            {id: 25, name: "Nasi Goreng", price: 13000, category: "makanan", description: "Nasi goreng dengan sayuran,dan telur, disiram kecap manis.", details: "", image: "https://drive.google.com/thumbnail?id=1xyw_PzCj25McfPJoE9Yslp6J_j3bXEpJ&sz=w1000"},
+            {id: 26, name: "Mie Jebew", price: 13000, category: "makanan", description: "Mie kuning dengan sayuran dan daging ayam, disiram kuah pedas.", details: "", image: "https://drive.google.com/thumbnail?id=1BGhnPQZpgD3c7v119EgrHZPV4SqnOlz8&sz=w1000"},
+            {id: 27, name: "Paket Ayam Geprek", price: 16000, category: "makanan", description: "Ayam goreng Kentucky (Pilih Bagiannya), Nasi putih, Lalap kol dan timun, saus abc stik, sambal geprek", details: "", image: "https://drive.google.com/thumbnail?id=10CiEPCjFvL6Lqf0X-CVuPxFxphC4r6Pl&sz=w1000"},
+            {id: 28, name: "Kebab", price: 10000, category: "makanan", description: "Rasakan perpaduan sempurna daging premium yang dipanggang perlahan hingga juicy, dibalut tortilla lembut, dan disempurnakan dengan irisan sayuran segar dan saus spesial yang kaya rasa. Setiap gigitan adalah petualangan rasa yang nendang dan bikin ketagihan!", details: "", image: "https://drive.google.com/thumbnail?id=1ijbGNh4CmNlQFkk31wVcERpxP1YmsJZl&sz=w1000"},
+            {id: 29, name: "Nasi Cumi Pedas", price: 13000, category: "makanan", description: "Nasi cumi pedas + telur, pedasnya membangkitkan semangat🔥", details: "", image: "https://drive.google.com/thumbnail?id=1cdxizUzpGZLfTpq1acIAjKTTdnYQa5sA&sz=w1000"},
+            {id: 30, name: "Mercon Baso, Otak-otak, Ceker", price: 12000, category: "makanan", description: "Paket pedas nagih berisi baso kenyal, otak-otak gurih, dan ceker empuk. Bumbu mercon-nya nendang, cocok buat pecinta pedas level dewa.", details: "", image: "https://drive.google.com/thumbnail?id=1HXj73a5nmvszIwXyhAYvoS8NjI2KWx7Y&sz=w1000"},
+            {id: 31, name: "Mercon Full Ceker", price: 10000, category: "makanan", description: "Satu porsi penuh ceker lembut yang disiram bumbu mercon pedas mantap. Murah, rame, dan bikin keringetan puas.", details: "", image: "https://drive.google.com/thumbnail?id=1HXj73a5nmvszIwXyhAYvoS8NjI2KWx7Y&sz=w1000"},
+            {id: 32, name: "Baso Taichan Mix", price: 12000, category: "makanan", description: "Baso taichan dengan cita rasa smoky pedas segar khas taichan. Isian lengkap, tekstur kenyal, dan rasa gurih yang bikin nambah.", details: "", image: "https://drive.google.com/thumbnail?id=1kPoQWPuv0uG6jR70Wco-YaysQvstmZWL&sz=w1000"},
+            {id: 33, name: "Boci Ayam Suwir", price: 10000, category: "makanan", description: "Bola aci besar berisi ayam suwir berbumbu gurih pedas. Kenyalnya pas, topping-nya melimpah.", details: "", image: "https://drive.google.com/thumbnail?id=1sZT_ZiOrkVvAM5ELX0hsaQZ5HAXj6ieZ&sz=w1000"},
+            {id: 34, name: "Boci Isi Baso", price: 7000, category: "makanan", description: "Baso aci kenyal yang diisi baso kecil. Kombinasi gurih dan pedas yang bikin susah berhenti makan.", details: "", image: "https://drive.google.com/thumbnail?id=1sZT_ZiOrkVvAM5ELX0hsaQZ5HAXj6ieZ&sz=w1000"},
+            {id: 35, name: "Boci Ori", price: 7000, category: "makanan", description: "Boci klasik tanpa isian. Simpel, kenyal, dan cocok dimakan pakai sambal pedas biar lebih nendang.", details: "Isi 2", image: "https://drive.google.com/thumbnail?id=1sZT_ZiOrkVvAM5ELX0hsaQZ5HAXj6ieZ&sz=w1000"},
+            {id: 36, name: "Chicken Wings", price: 7000, category: "makanan", description: "Sayap ayam crispy dengan bumbu gurih pedas yang meresap sampai ke dalam. Bisa pilih saus—manis, pedas, atau BBQ. Juicy, wangi, dan bikin pengen nambah terus.", details: "", image: "https://drive.google.com/thumbnail?id=1vVBOFf-kltj81GPivZpOByqf91a3SBC2&sz=w1000"},
 
             // === MINUMAN ===
-            {
-                id: 37,
-                name: "Yogurt",
-                price: 10000,
-                category: "minuman",
-                description: "Minuman yogurt segar dan sehat",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1GLm6MIdgA5_nTeJwmuKmyEOg4g5CdJjS&sz=w1000"
-            },
-            {
-                id: 38,
-                name: "Susu Kurma",
-                price: 15000,
-                category: "minuman",
-                description: "Minuman sehat yg terbuat dari 100% kurma asli dan susu.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1hoVzb5bUo4mXo4sKOnpDEKLcQfauD26g&sz=w1000"
-            },
-            {
-                id: 39,
-                name: "Es Kuwut Bali",
-                price: 7000,
-                category: "minuman",
-                description: "Minuman segar dengan campuran melon, kelapa muda, perasan jeruk nipis, biji selasih, dan es batu. Rasanya manis, asem, dan fresh.",
-                details: "",
-                image: "https://drive.google.com/thumbnail?id=1Dpt-Xs4a3KXtHjc2JogDajcjmRS3e7N-&sz=w1000"
-            }
+            {id: 37, name: "Yogurt", price: 10000, category: "minuman", description: "Minuman yogurt segar dan sehat", details: "", image: "https://drive.google.com/thumbnail?id=1GLm6MIdgA5_nTeJwmuKmyEOg4g5CdJjS&sz=w1000"},
+            {id: 38, name: "Susu Kurma", price: 15000, category: "minuman", description: "Minuman sehat yg terbuat dari 100% kurma asli dan susu.", details: "", image: "https://drive.google.com/thumbnail?id=1hoVzb5bUo4mXo4sKOnpDEKLcQfauD26g&sz=w1000"},
+            {id: 39, name: "Es Kuwut Bali", price: 7000, category: "minuman", description: "Minuman segar dengan campuran melon, kelapa muda, perasan jeruk nipis, biji selasih, dan es batu. Rasanya manis, asem, dan fresh.", details: "", image: "https://drive.google.com/thumbnail?id=1Dpt-Xs4a3KXtHjc2JogDajcjmRS3e7N-&sz=w1000"}
         ];
-
-        // ===== STATE =====
-        let cart = JSON.parse(localStorage.getItem('loginKantinCart')) || [];
-        let selectedTime = "12:00";
-        let currentCategory = "all";
 
         // ===== UTILITY FUNCTIONS =====
         function formatCurrency(amount) {
-            return `Rp ${amount.toLocaleString('id-ID')}`;
+            return 'Rp ' + amount.toLocaleString('id-ID');
         }
 
         function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                ${message}
-            `;
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const icon = toast.querySelector('i');
             
-            document.body.appendChild(toast);
+            if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle mr-2 text-red-400';
+            } else if (type === 'warning') {
+                icon.className = 'fas fa-exclamation-triangle mr-2 text-yellow-400';
+            } else {
+                icon.className = 'fas fa-check-circle mr-2 text-green-400';
+            }
+            
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
             
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                setTimeout(() => toast.remove(), 300);
+                toast.classList.add('hidden');
             }, 3000);
         }
 
-        // ===== CART MANAGEMENT =====
-        function updateCart() {
-            const count = cart.reduce((total, item) => total + item.quantity, 0);
-            document.getElementById('cartCount').textContent = count;
-            localStorage.setItem('loginKantinCart', JSON.stringify(cart));
-            renderCartItems();
+        // ===== TIME MANAGEMENT =====
+        function getJakartaTime() {
+            const now = new Date();
+            return new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
         }
 
-        function addToCart(itemId) {
-            const now = new Date();
-            const jakartaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
+        function isPreOrderTimeAllowed() {
+            const jakartaTime = getJakartaTime();
+            const hour = jakartaTime.getHours();
+            return hour >= CONFIG.PRE_ORDER_START && hour < CONFIG.PRE_ORDER_END;
+        }
+
+        function updateCountdown() {
+            const jakartaTime = getJakartaTime();
             const hour = jakartaTime.getHours();
             
-            // PERBAIKAN: Cek apakah masih bisa pre-order untuk besok
-            if (hour >= CONFIG.PRE_ORDER_END_HOUR) {
-                const tomorrow = new Date(jakartaTime);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const formattedTomorrow = tomorrow.toLocaleDateString('id-ID', {
+            let targetTime;
+            
+            if (hour < CONFIG.PRE_ORDER_START) {
+                targetTime = new Date(jakartaTime);
+                targetTime.setHours(CONFIG.PRE_ORDER_START, 0, 0, 0);
+            } else if (hour >= CONFIG.PRE_ORDER_START && hour < CONFIG.PRE_ORDER_END) {
+                targetTime = new Date(jakartaTime);
+                targetTime.setHours(CONFIG.PRE_ORDER_END, 0, 0, 0);
+            } else {
+                targetTime = new Date(jakartaTime);
+                targetTime.setDate(targetTime.getDate() + 1);
+                targetTime.setHours(CONFIG.PRE_ORDER_START, 0, 0, 0);
+            }
+            
+            const diff = targetTime - jakartaTime;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('countdown').textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function setOrderDate() {
+            const jakartaTime = getJakartaTime();
+            const hour = jakartaTime.getHours();
+            
+            let pickupDate = new Date(jakartaTime);
+            
+            if (hour >= CONFIG.PRE_ORDER_END) {
+                pickupDate.setDate(pickupDate.getDate() + 2);
+            } else {
+                pickupDate.setDate(pickupDate.getDate() + 1);
+            }
+            
+            const formattedDate = pickupDate.toISOString().split('T')[0];
+            const dateInput = document.getElementById('orderDate');
+            const dateText = document.getElementById('orderDateHelp');
+            
+            if (dateInput && dateText) {
+                dateInput.value = formattedDate;
+                
+                const displayDate = pickupDate.toLocaleDateString('id-ID', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                 });
                 
-                showToast(`Pre-order untuk besok sudah ditutup jam 20:00. Silakan pre-order untuk lusa (${formattedTomorrow})`, 'error');
-                return;
+                if (hour >= CONFIG.PRE_ORDER_END) {
+                    dateText.textContent = `Pre-order ditutup jam 20:00. Ini adalah pre-order untuk lusa (${displayDate})`;
+                } else {
+                    dateText.textContent = `Pre-order untuk besok (${displayDate})`;
+                }
             }
+        }
+
+        function updateTimeStatus() {
+            const statusElement = document.getElementById('currentTimeStatus');
+            const isOpen = isPreOrderTimeAllowed();
+            const confirmBtn = document.getElementById('confirmOrderBtn');
+            
+            if (statusElement) {
+                if (isOpen) {
+                    statusElement.className = 'mb-6 p-4 rounded-lg bg-green-50 border border-green-200';
+                    statusElement.innerHTML = `
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-medium text-green-800">Pre-order sedang aktif</h4>
+                                <p class="text-sm text-green-700 mt-1">Anda bisa melakukan pre-order untuk pengambilan besok (07:00 - 20:00)</p>
+                            </div>
+                        </div>
+                    `;
+                    if (confirmBtn) confirmBtn.disabled = false;
+                } else {
+                    statusElement.className = 'mb-6 p-4 rounded-lg bg-red-50 border border-red-200';
+                    statusElement.innerHTML = `
+                        <div class="flex items-start">
+                            <i class="fas fa-times-circle text-red-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-medium text-red-800">Pre-order sudah ditutup</h4>
+                                <p class="text-sm text-red-700 mt-1">Pre-order untuk besok sudah ditutup jam 20:00. Silakan order untuk lusa.</p>
+                            </div>
+                        </div>
+                    `;
+                    if (confirmBtn) confirmBtn.disabled = true;
+                }
+            }
+        }
+
+        // ===== CART MANAGEMENT =====
+        function updateCart() {
+            localStorage.setItem('loginKantinCart', JSON.stringify(state.cart));
+            
+            const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+            document.getElementById('floatingCartCount').textContent = totalItems;
+            
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            checkoutBtn.disabled = totalItems === 0;
+            
+            renderCartItems();
+            renderMenu();
+        }
+
+        function addToCart(itemId, quantity = 1) {
+            const now = getJakartaTime();
+            const hour = now.getHours();
             
             if (!isPreOrderTimeAllowed()) {
                 showToast('Pre-order hanya bisa dilakukan jam 07:00 - 20:00', 'error');
@@ -1969,37 +679,33 @@
             }
             
             const menuItem = MENU_DATA.find(item => item.id === itemId);
-            const existingItem = cart.find(item => item.id === itemId);
+            if (!menuItem) return;
+            
+            const existingItem = state.cart.find(item => item.id === itemId);
             
             if (existingItem) {
-                existingItem.quantity += 1;
+                existingItem.quantity += quantity;
             } else {
-                cart.push({
-                    ...menuItem,
-                    quantity: 1
+                state.cart.push({
+                    id: menuItem.id,
+                    name: menuItem.name,
+                    price: menuItem.price,
+                    quantity: quantity
                 });
             }
             
             updateCart();
             showToast(`${menuItem.name} ditambahkan ke keranjang`);
-            
-            // Animation feedback
-            const cartIcon = document.getElementById('cartIcon');
-            cartIcon.classList.add('added');
-            setTimeout(() => cartIcon.classList.remove('added'), 300);
-            
-            // Update button in menu
-            renderMenu();
         }
 
         function removeFromCart(itemId) {
-            cart = cart.filter(item => item.id !== itemId);
+            state.cart = state.cart.filter(item => item.id !== itemId);
             updateCart();
-            renderMenu();
+            showToast('Item dihapus dari keranjang');
         }
 
-        function updateQuantity(itemId, change) {
-            const item = cart.find(item => item.id === itemId);
+        function updateCartQuantity(itemId, change) {
+            const item = state.cart.find(item => item.id === itemId);
             if (item) {
                 item.quantity += change;
                 if (item.quantity <= 0) {
@@ -2010,301 +716,385 @@
             }
         }
 
-        function renderCartItems() {
-            const cartItems = document.getElementById('cartItems');
-            const cartTotal = document.getElementById('cartTotal');
+        // ===== RENDERING =====
+        function renderCategories() {
+            const categories = ['all', 'cemilan', 'dessert', 'makanan', 'minuman'];
+            const categoryNames = {
+                'all': 'Semua',
+                'cemilan': 'Cemilan',
+                'dessert': 'Dessert',
+                'makanan': 'Makanan',
+                'minuman': 'Minuman'
+            };
             
-            if (cart.length === 0) {
-                cartItems.innerHTML = `
-                    <div style="text-align: center; padding: 3rem 1rem; color: var(--text-gray);">
-                        <i class="fas fa-shopping-cart" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                        <p>Keranjang masih kosong</p>
-                        <a href="#menu" style="color: var(--primary-blue); text-decoration: none; font-weight: 500;">
-                            Pilih menu dulu yuk!
-                        </a>
+            const container = document.getElementById('categorySwiper');
+            container.innerHTML = '';
+            
+            categories.forEach(category => {
+                const slide = document.createElement('div');
+                slide.className = 'swiper-slide';
+                slide.innerHTML = `
+                    <button class="category-btn px-4 py-2 rounded-full whitespace-nowrap font-medium transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        state.currentCategory === category 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }" 
+                    data-category="${category}"
+                    ${state.currentCategory === category ? 'aria-pressed="true"' : 'aria-pressed="false"'}>
+                        ${categoryNames[category]}
+                    </button>
+                `;
+                container.appendChild(slide);
+            });
+            
+            if (!state.swiper) {
+                state.swiper = new Swiper('.swiper-container', {
+                    slidesPerView: 'auto',
+                    spaceBetween: 8,
+                    freeMode: true,
+                    scrollbar: {
+                        el: '.swiper-scrollbar',
+                        draggable: true
+                    }
+                });
+            } else {
+                state.swiper.update();
+            }
+            
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.currentCategory = btn.dataset.category;
+                    renderCategories();
+                    renderMenu();
+                });
+            });
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menuGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            let filteredItems = MENU_DATA;
+            
+            if (state.currentCategory !== 'all') {
+                filteredItems = filteredItems.filter(item => item.category === state.currentCategory);
+            }
+            
+            if (state.searchQuery) {
+                const query = state.searchQuery.toLowerCase();
+                filteredItems = filteredItems.filter(item => 
+                    item.name.toLowerCase().includes(query) || 
+                    item.description.toLowerCase().includes(query)
+                );
+            }
+            
+            if (filteredItems.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            container.innerHTML = '';
+            
+            filteredItems.forEach(item => {
+                const inCart = state.cart.find(cartItem => cartItem.id === item.id);
+                const quantity = inCart ? inCart.quantity : 0;
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden card-hover';
+                card.innerHTML = `
+                    <div class="p-4">
+                        <div class="flex items-start space-x-4">
+                            <!-- Image -->
+                            <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
+                                <img src="${item.image}" 
+                                     alt="${item.name}" 
+                                     class="w-full h-full object-cover"
+                                     loading="lazy"
+                                     onerror="handleImgError(this)">
+                            </div>
+                            
+                            <!-- Content -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-medium text-gray-900 truncate">${item.name}</h3>
+                                    <span class="font-bold text-orange-600 ml-2">${formatCurrency(item.price)}</span>
+                                </div>
+                                
+                                <p class="text-sm text-gray-500 mt-1 line-clamp-2">${item.description}</p>
+                                
+                                ${item.details ? `<p class="text-xs text-blue-600 font-medium mt-1">${item.details}</p>` : ''}
+                                
+                                <!-- Quick Actions -->
+                                <div class="flex items-center justify-between mt-3">
+                                    <button class="quick-add-btn p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            data-id="${item.id}"
+                                            aria-label="Tambah ${item.name} ke keranjang">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                    
+                                    ${quantity > 0 ? `
+                                        <div class="flex items-center space-x-2">
+                                            <button class="quantity-btn p-1 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                                                    data-id="${item.id}" 
+                                                    data-change="-1"
+                                                    aria-label="Kurangi jumlah">
+                                                <i class="fas fa-minus text-sm"></i>
+                                            </button>
+                                            <span class="font-medium" aria-live="polite">${quantity}</span>
+                                            <button class="quantity-btn p-1 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                                                    data-id="${item.id}" 
+                                                    data-change="1"
+                                                    aria-label="Tambah jumlah">
+                                                <i class="fas fa-plus text-sm"></i>
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    <button class="view-detail-btn text-sm text-blue-600 font-medium hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
+                                            data-id="${item.id}">
+                                        Detail
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 `;
-                cartTotal.textContent = formatCurrency(0);
+                
+                container.appendChild(card);
+            });
+            
+            document.querySelectorAll('.quick-add-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    addToCart(parseInt(btn.dataset.id));
+                });
+            });
+            
+            document.querySelectorAll('.quantity-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    updateCartQuantity(parseInt(btn.dataset.id), parseInt(btn.dataset.change));
+                });
+            });
+            
+            document.querySelectorAll('.view-detail-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    openMenuModal(parseInt(btn.dataset.id));
+                });
+            });
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cartItems');
+            
+            if (state.cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-500">
+                        <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-shopping-cart text-gray-300 text-2xl"></i>
+                        </div>
+                        <p class="mb-2">Keranjang masih kosong</p>
+                        <p class="text-sm text-gray-400">Tambahkan menu favorit Anda</p>
+                    </div>
+                `;
+                
+                document.getElementById('cartTotal').textContent = formatCurrency(0);
                 return;
             }
             
             let total = 0;
-            cartItems.innerHTML = '';
+            container.innerHTML = '';
             
-            cart.forEach(item => {
+            state.cart.forEach(item => {
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
                 
                 const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
+                cartItem.className = 'flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200 mb-3';
                 cartItem.innerHTML = `
-                    <div class="cart-item-image">
-                        <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fas fa-utensils\\'></i>';">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                        <i class="fas fa-utensils text-gray-400"></i>
                     </div>
-                    <div class="cart-item-info">
-                        <h4>${item.name}</h4>
-                        <div class="cart-item-price">${formatCurrency(item.price)}</div>
-                        <div class="cart-item-controls">
-                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
-                            <span style="min-width: 30px; text-align: center;">${item.quantity}</span>
-                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
-                            <button class="quantity-btn" onclick="removeFromCart(${item.id})" style="margin-left: 10px; color: var(--accent-red);">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                    
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-medium text-gray-900 truncate">${item.name}</h4>
+                        <p class="text-sm text-orange-600 font-medium">${formatCurrency(item.price)}</p>
                     </div>
-                `;
-                
-                cartItems.appendChild(cartItem);
-            });
-            
-            cartTotal.textContent = formatCurrency(total);
-        }
-
-        // ===== MENU RENDERING =====
-        function renderMenu() {
-            const menuGrid = document.getElementById('menuGrid');
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
-            const filteredItems = MENU_DATA.filter(item => {
-                const matchesCategory = currentCategory === 'all' || item.category === currentCategory;
-                const matchesSearch = item.name.toLowerCase().includes(searchTerm) || 
-                                    item.description.toLowerCase().includes(searchTerm);
-                return matchesCategory && matchesSearch;
-            });
-            
-            menuGrid.innerHTML = '';
-            
-            if (filteredItems.length === 0) {
-                menuGrid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-gray);">
-                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                        <p>Menu tidak ditemukan</p>
-                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Coba cari dengan kata kunci lain</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            filteredItems.forEach(item => {
-                const isInCart = cart.some(cartItem => cartItem.id === item.id);
-                
-                const menuCard = document.createElement('div');
-                menuCard.className = 'menu-card fade-in';
-                
-                menuCard.innerHTML = `
-                    <div class="menu-image">
-                        <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'image-placeholder\\'><i class=\\'fas fa-utensils\\'></i></div>';">
-                    </div>
-                    <div class="menu-content">
-                        <div class="menu-header">
-                            <h3>${item.name}</h3>
-                            <div class="menu-price">${formatCurrency(item.price)}</div>
-                        </div>
-                        <span class="menu-category">${item.category}</span>
-                        <p class="menu-description">${item.description}</p>
-                        ${item.details ? `<div class="menu-details">${item.details}</div>` : ''}
-                        <button class="add-to-cart-btn ${isInCart ? 'added' : ''}" 
-                                onclick="addToCart(${item.id})">
-                            ${isInCart ? '<i class="fas fa-check"></i> Sudah ditambahkan' : '<i class="fas fa-cart-plus"></i> Tambah ke Pre-Order'}
+                    
+                    <div class="flex items-center space-x-3">
+                        <button class="cart-quantity-btn p-1 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                                data-id="${item.id}" 
+                                data-change="-1"
+                                aria-label="Kurangi ${item.name}">
+                            <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <span class="font-medium w-8 text-center" aria-live="polite">${item.quantity}</span>
+                        <button class="cart-quantity-btn p-1 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                                data-id="${item.id}" 
+                                data-change="1"
+                                aria-label="Tambah ${item.name}">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                        <button class="cart-remove-btn p-2 text-red-500 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 rounded-full"
+                                data-id="${item.id}"
+                                aria-label="Hapus ${item.name}">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 `;
                 
-                menuGrid.appendChild(menuCard);
+                container.appendChild(cartItem);
             });
-        }
-
-        // ===== TIME MANAGEMENT =====
-        function isPreOrderTimeAllowed() {
-            const now = new Date();
-            const jakartaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
-            const hour = jakartaTime.getHours();
-            return hour >= CONFIG.PRE_ORDER_START_HOUR && hour < CONFIG.PRE_ORDER_END_HOUR;
-        }
-
-        function updateCountdown() {
-            const now = new Date();
-            const jakartaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
-            const hour = jakartaTime.getHours();
             
-            let targetTime, label, status;
+            document.getElementById('cartTotal').textContent = formatCurrency(total);
             
-            if (hour < CONFIG.PRE_ORDER_START_HOUR) {
-                // Before opening
-                targetTime = new Date(jakartaTime);
-                targetTime.setHours(CONFIG.PRE_ORDER_START_HOUR, 0, 0, 0);
-                label = "Pre-Order lagi setelah:";
-                status = "Pre-order buka pukul 07:00";
-            } else if (hour >= CONFIG.PRE_ORDER_START_HOUR && hour < CONFIG.PRE_ORDER_END_HOUR) {
-                // During pre-order hours
-                targetTime = new Date(jakartaTime);
-                targetTime.setHours(CONFIG.PRE_ORDER_END_HOUR, 0, 0, 0);
-                label = "Pre-Order akan berakhir:";
-                status = "Pre-order tutup pukul 20:00";
-            } else {
-                // After closing
-                targetTime = new Date(jakartaTime);
-                targetTime.setDate(targetTime.getDate() + 1);
-                targetTime.setHours(CONFIG.PRE_ORDER_START_HOUR, 0, 0, 0);
-                label = "Pre-Order lagi setelah:";
-                status = "Pre-order buka besok 07:00";
-            }
-            
-            const diff = targetTime - jakartaTime;
-            
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            document.getElementById('countdownLabel').textContent = label;
-            document.getElementById('countdownStatus').textContent = status;
-            document.getElementById('countdownTimer').textContent = 
-                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            // Update time status in modal
-            const timeStatus = document.getElementById('currentTimeStatus');
-            if (timeStatus) {
-                const isOpen = isPreOrderTimeAllowed();
-                timeStatus.className = `time-status ${isOpen ? 'open' : 'closed'}`;
-                timeStatus.innerHTML = isOpen 
-                    ? '<p><i class="fas fa-check-circle"></i> Waktu pre-order aktif (07:00 - 20:00)</p>'
-                    : '<p><i class="fas fa-times-circle"></i> Pre-order untuk besok sudah ditutup</p>';
-            }
-        }
-
-        function setOrderDate() {
-            const now = new Date();
-            const jakartaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
-            const hour = jakartaTime.getHours();
-            
-            let pickupDate = new Date(jakartaTime);
-            
-            // PERBAIKAN: Jika setelah jam 20:00, pre-order untuk besok sudah tutup
-            // Maka pengambilan adalah lusa (2 hari setelah hari ini)
-            if (hour >= CONFIG.PRE_ORDER_END_HOUR) {
-                // Sudah lewat jam 20:00, pre-order untuk lusa
-                pickupDate.setDate(pickupDate.getDate() + 2);
-            } else {
-                // Masih dalam jam pre-order (sebelum 20:00), pre-order untuk besok
-                pickupDate.setDate(pickupDate.getDate() + 1);
-            }
-            
-            const formattedDate = pickupDate.toISOString().split('T')[0];
-            const dateInput = document.getElementById('orderDate');
-            if (dateInput) {
-                dateInput.value = formattedDate;
-                dateInput.min = formattedDate;
-                dateInput.max = formattedDate;
-                
-                // Format tampilan tanggal untuk user
-                const formattedDisplay = pickupDate.toLocaleDateString('id-ID', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
+            document.querySelectorAll('.cart-quantity-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    updateCartQuantity(parseInt(btn.dataset.id), parseInt(btn.dataset.change));
                 });
-                
-                // Update text informasi di bawah input tanggal
-                const infoText = dateInput.nextElementSibling;
-                if (infoText && infoText.tagName === 'SMALL') {
-                    if (hour >= CONFIG.PRE_ORDER_END_HOUR) {
-                        infoText.textContent = `Pre-order ditutup jam 20:00. Ini adalah pre-order untuk lusa (${formattedDisplay})`;
-                    } else {
-                        infoText.textContent = `Pre-order untuk besok (${formattedDisplay})`;
-                    }
-                }
-            }
-        }
-
-        // ===== WHATSAPP ORDER =====
-        function sendOrderViaWhatsApp() {
-            const orderDate = document.getElementById('orderDate').value;
-            const instructions = document.getElementById('instructions').value;
-            
-            if (!orderDate) {
-                showToast('Silakan pilih tanggal pengambilan', 'error');
-                return;
-            }
-            
-            const formattedDate = new Date(orderDate).toLocaleDateString('id-ID', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
             });
             
-            let message = `Halo LOGIN! Saya ingin pre-order:\n\n`;
-            let total = 0;
-            
-            cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                message += `• ${item.name} x${item.quantity} = ${formatCurrency(itemTotal)}\n`;
+            document.querySelectorAll('.cart-remove-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    removeFromCart(parseInt(btn.dataset.id));
+                });
             });
-            
-            message += `\nTotal: ${formatCurrency(total)}`;
-            message += `\nTanggal Pengambilan: ${formattedDate}`;
-            message += `\nWaktu: ${selectedTime} WIB`;
-            
-            if (instructions.trim()) {
-                message += `\nInstruksi Khusus: ${instructions}`;
-            }
-            
-            message += `\n\n_Pre-order via website LOGIN Kantin_`;
-            message += `\n\nTerima kasih!`;
-            
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/${CONFIG.ADMIN_WHATSAPP}?text=${encodedMessage}`;
-            
-            // Clear cart
-            cart = [];
-            updateCart();
-            closeCart();
-            closeModal();
-            
-            // Redirect to WhatsApp
-            window.open(whatsappUrl, '_blank');
-            showToast('Pre-order berhasil! Anda akan diarahkan ke WhatsApp');
         }
 
-        // ===== MODAL & CART CONTROLS =====
-        function openCart() {
-            document.getElementById('cartOverlay').classList.add('active');
-            document.getElementById('cartSidebar').classList.add('active');
+        // ===== MODAL FUNCTIONS =====
+        function openCartSidebar() {
+            document.getElementById('cartSidebar').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
 
-        function closeCart() {
-            document.getElementById('cartOverlay').classList.remove('active');
-            document.getElementById('cartSidebar').classList.remove('active');
+        function closeCartSidebar() {
+            document.getElementById('cartSidebar').classList.add('hidden');
             document.body.style.overflow = '';
         }
 
-        function openModal() {
-            if (cart.length === 0) {
+        function openMenuModal(itemId) {
+            const item = MENU_DATA.find(m => m.id === itemId);
+            if (!item) return;
+            
+            const modal = document.getElementById('menuModal');
+            const modalContent = modal.querySelector('.absolute.bottom-0');
+            
+            const inCart = state.cart.find(cartItem => cartItem.id === item.id);
+            const quantity = inCart ? inCart.quantity : 0;
+            
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <!-- Header -->
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900">${item.name}</h3>
+                            <p class="text-lg font-bold text-orange-600 mt-1">${formatCurrency(item.price)}</p>
+                            <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full mt-2">
+                                ${item.category}
+                            </span>
+                        </div>
+                        <button id="closeMenuModal" class="p-2 rounded-full hover:bg-gray-100 ml-4 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            <i class="fas fa-times text-gray-600 text-lg"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Image -->
+                    <div class="w-full h-48 rounded-xl bg-gray-100 mb-6 overflow-hidden">
+                        <img src="${item.image}" 
+                             alt="${item.name}" 
+                             class="w-full h-full object-cover"
+                             onerror="handleImgError(this)">
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-6">
+                        <h4 class="font-medium text-gray-900 mb-2">Deskripsi</h4>
+                        <p class="text-gray-600">${item.description}</p>
+                        ${item.details ? `<p class="text-blue-600 font-medium mt-2">${item.details}</p>` : ''}
+                    </div>
+                    
+                    <!-- Quantity Controls -->
+                    <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium text-gray-900">Jumlah</span>
+                            <div class="flex items-center space-x-4">
+                                <button class="modal-quantity-btn p-2 rounded-full bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        data-change="-1"
+                                        aria-label="Kurangi jumlah">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span id="modalQuantity" class="font-bold text-xl w-12 text-center" aria-live="polite">${quantity}</span>
+                                <button class="modal-quantity-btn p-2 rounded-full bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        data-change="1"
+                                        aria-label="Tambah jumlah">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <button id="addToCartBtn" 
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            <i class="fas fa-cart-plus mr-2"></i>
+                            ${quantity > 0 ? 'Update Keranjang' : 'Tambah ke Keranjang'}
+                        </button>
+                        <button id="closeMenuModalBtn" 
+                                class="w-full border-2 border-gray-300 text-gray-700 font-medium py-3 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            modal.dataset.itemId = itemId;
+            
+            document.getElementById('closeMenuModal').addEventListener('click', closeMenuModal);
+            document.getElementById('closeMenuModalBtn').addEventListener('click', closeMenuModal);
+            document.getElementById('addToCartBtn').addEventListener('click', () => {
+                const quantity = parseInt(document.getElementById('modalQuantity').textContent);
+                if (quantity > 0) {
+                    const currentItem = state.cart.find(cartItem => cartItem.id === itemId);
+                    if (currentItem) {
+                        currentItem.quantity = quantity;
+                    } else {
+                        state.cart.push({
+                            id: item.id,
+                            name: item.name,
+                            price: item.price,
+                            quantity: quantity
+                        });
+                    }
+                    updateCart();
+                    showToast(`${item.name} ${currentItem ? 'diupdate' : 'ditambahkan'} ke keranjang`);
+                }
+                closeMenuModal();
+            });
+            
+            document.querySelectorAll('.modal-quantity-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const change = parseInt(btn.dataset.change);
+                    const quantityElement = document.getElementById('modalQuantity');
+                    let newQuantity = parseInt(quantityElement.textContent) + change;
+                    if (newQuantity < 0) newQuantity = 0;
+                    quantityElement.textContent = newQuantity;
+                });
+            });
+        }
+
+        function closeMenuModal() {
+            document.getElementById('menuModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openCheckoutModal() {
+            if (state.cart.length === 0) {
                 showToast('Keranjang masih kosong', 'error');
                 return;
-            }
-            
-            const now = new Date();
-            const jakartaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
-            const hour = jakartaTime.getHours();
-            
-            // PERBAIKAN: Update setOrderDate setiap kali modal dibuka
-            setOrderDate();
-            
-            if (hour >= CONFIG.PRE_ORDER_END_HOUR) {
-                const tomorrow = new Date(jakartaTime);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const formattedTomorrow = tomorrow.toLocaleDateString('id-ID', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-                
-                showToast(`Pre-order untuk besok sudah ditutup jam 20:00. Ini adalah pre-order untuk lusa`, 'warning');
             }
             
             if (!isPreOrderTimeAllowed()) {
@@ -2312,171 +1102,116 @@
                 return;
             }
             
-            document.getElementById('modalOverlay').classList.add('active');
+            setOrderDate();
+            updateTimeStatus();
+            
+            document.getElementById('checkoutModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            closeCart();
+            closeCartSidebar();
         }
 
-        function closeModal() {
-            document.getElementById('modalOverlay').classList.remove('active');
-            document.getElementById('instructions').value = '';
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
             document.body.style.overflow = '';
         }
 
-        // ===== INITIALIZATION =====
-        function initParticles() {
-            if (typeof particlesJS !== 'undefined') {
-                particlesJS('particles-js', {
-                    particles: {
-                        number: { value: 60, density: { enable: true, value_area: 800 } },
-                        color: { value: "#ffffff" },
-                        shape: { type: "circle" },
-                        opacity: { value: 0.3, random: true },
-                        size: { value: 3, random: true },
-                        line_linked: {
-                            enable: true,
-                            distance: 150,
-                            color: "#ffffff",
-                            opacity: 0.1,
-                            width: 1
-                        },
-                        move: {
-                            enable: true,
-                            speed: 1,
-                            direction: "none",
-                            random: true,
-                            straight: false,
-                            out_mode: "out",
-                            bounce: false
-                        }
-                    },
-                    interactivity: {
-                        detect_on: "canvas",
-                        events: {
-                            onhover: { enable: true, mode: "grab" },
-                            onclick: { enable: true, mode: "push" }
-                        }
-                    },
-                    retina_detect: true
-                });
+        // ===== WHATSAPP ORDER =====
+        function sendOrderViaWhatsApp() {
+            const orderDate = document.getElementById('orderDate').value;
+            const notes = document.getElementById('orderNotes').value;
+            
+            if (!orderDate) {
+                showToast('Silakan pilih tanggal pengambilan', 'error');
+                return;
             }
+            
+            const dateObj = new Date(orderDate);
+            const formattedDate = dateObj.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            let message = `*PRE-ORDER LOGIN KANTIN*\n\n`;
+            message += `Tanggal Pengambilan: ${formattedDate}\n`;
+            message += `Waktu: ${state.selectedTime} WIB\n\n`;
+            message += `*Detail Pesanan:*\n`;
+            
+            let total = 0;
+            state.cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                message += `• ${item.name} x${item.quantity} = ${formatCurrency(itemTotal)}\n`;
+            });
+            
+            message += `\n*Total: ${formatCurrency(total)}*\n`;
+            
+            if (notes.trim()) {
+                message += `\nCatatan: ${notes}\n`;
+            }
+            
+            message += `\n_Pre-order via website LOGIN Kantin_`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${CONFIG.ADMIN_PHONE}?text=${encodedMessage}`;
+            
+            state.cart = [];
+            updateCart();
+            closeCheckoutModal();
+            
+            window.open(whatsappUrl, '_blank');
+            showToast('Pre-order dikirim ke WhatsApp!');
         }
 
-        function initEventListeners() {
-            // Hamburger menu
-            document.getElementById('hamburgerBtn').addEventListener('click', () => {
-                document.getElementById('navLinks').classList.toggle('active');
-            });
+        // ===== INITIALIZATION =====
+        function init() {
+            renderCategories();
+            renderMenu();
+            updateCart();
             
-            // Close mobile menu when clicking a link
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.addEventListener('click', () => {
-                    document.getElementById('navLinks').classList.remove('active');
-                });
-            });
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
             
-            // Category filters
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentCategory = this.dataset.category;
-                    renderMenu();
-                });
-            });
+            setOrderDate();
             
-            // Search input
-            document.getElementById('searchInput').addEventListener('input', renderMenu);
-            
-            // Cart controls
-            document.getElementById('cartIcon').addEventListener('click', openCart);
-            document.getElementById('closeCart').addEventListener('click', closeCart);
-            document.getElementById('cartOverlay').addEventListener('click', closeCart);
-            document.getElementById('checkoutBtn').addEventListener('click', openModal);
-            
-            // Modal controls
-            document.getElementById('closeModal').addEventListener('click', closeModal);
-            document.getElementById('modalOverlay').addEventListener('click', (e) => {
-                if (e.target === e.currentTarget) closeModal();
-            });
-            
-            // Time slot selection
-            document.querySelectorAll('.time-slot').forEach(slot => {
-                slot.addEventListener('click', function() {
-                    if (this.classList.contains('disabled')) return;
-                    
-                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-                    this.classList.add('selected');
-                    selectedTime = this.dataset.time;
-                    
-                    // Enable confirm button if time is selected
-                    const confirmBtn = document.getElementById('confirmOrderBtn');
-                    confirmBtn.disabled = !isPreOrderTimeAllowed();
-                });
-            });
-            
-            // Confirm order
+            document.getElementById('cartBtn').addEventListener('click', openCartSidebar);
+            document.getElementById('floatingCartBtn').addEventListener('click', openCartSidebar);
+            document.getElementById('closeCart').addEventListener('click', closeCartSidebar);
+            document.getElementById('cartOverlay').addEventListener('click', closeCartSidebar);
+            document.getElementById('checkoutBtn').addEventListener('click', openCheckoutModal);
+            document.getElementById('closeCheckoutModal').addEventListener('click', closeCheckoutModal);
+            document.getElementById('checkoutOverlay').addEventListener('click', closeCheckoutModal);
             document.getElementById('confirmOrderBtn').addEventListener('click', sendOrderViaWhatsApp);
+            document.getElementById('menuModalOverlay').addEventListener('click', closeMenuModal);
             
-            // Close modals with Escape key
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closeCart();
-                    closeModal();
-                }
+            document.querySelectorAll('.time-slot-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.time-slot-btn').forEach(b => {
+                        b.classList.remove('time-slot-selected', 'border-blue-500', 'bg-blue-50', 'text-blue-700');
+                        b.classList.add('border-gray-300', 'text-gray-700');
+                        b.setAttribute('aria-checked', 'false');
+                    });
+                    
+                    this.classList.add('time-slot-selected', 'border-blue-500', 'bg-blue-50', 'text-blue-700');
+                    this.classList.remove('border-gray-300', 'text-gray-700');
+                    this.setAttribute('aria-checked', 'true');
+                    state.selectedTime = this.dataset.time;
+                });
             });
             
-            // Auto-check time status for confirm button
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                state.searchQuery = e.target.value;
+                renderMenu();
+            });
+            
             const confirmBtn = document.getElementById('confirmOrderBtn');
             if (confirmBtn) {
                 confirmBtn.disabled = !isPreOrderTimeAllowed();
             }
         }
 
-        // ===== INITIALIZE APP =====
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize components
-            updateCart();
-            renderMenu();
-            setOrderDate();
-            initParticles();
-            initEventListeners();
-            
-            // Start timers
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
-            
-            // Check pre-order time every minute
-            setInterval(() => {
-                const isOpen = isPreOrderTimeAllowed();
-                const confirmBtn = document.getElementById('confirmOrderBtn');
-                if (confirmBtn) {
-                    confirmBtn.disabled = !isOpen;
-                }
-            }, 60000);
-            
-            // GSAP Animations
-            gsap.registerPlugin(ScrollTrigger);
-            
-            // Animate elements on scroll
-            gsap.utils.toArray('.fade-in').forEach(element => {
-                gsap.fromTo(element, 
-                    { opacity: 0, y: 30 },
-                    {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.8,
-                        scrollTrigger: {
-                            trigger: element,
-                            start: "top 85%",
-                            end: "bottom 15%",
-                            toggleActions: "play none none reverse"
-                        }
-                    }
-                );
-            });
-        });
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-
 </html>
