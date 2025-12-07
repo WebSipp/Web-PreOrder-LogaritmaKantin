@@ -369,6 +369,41 @@
                 <!-- Form -->
                 <div class="space-y-4">
                     <div>
+                        <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <input type="text" 
+                               id="customerName" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                               placeholder="Masukkan nama lengkap Anda"
+                               required>
+                    </div>
+
+                    <div>
+                        <label for="customerStatus" class="block text-sm font-medium text-gray-700 mb-1">Sebagai <span class="text-red-500">*</span></label>
+                        <select id="customerStatus" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                required>
+                            <option value="">Pilih status Anda</option>
+                            <option value="Mahasiswa">Mahasiswa</option>
+                            <option value="Dosen">Dosen</option>
+                            <option value="Staff Kampus">Staff Kampus</option>
+                            <option value="Magang">Magang</option>
+                            <option value="Tamu">Tamu</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="pickupLocation" class="block text-sm font-medium text-gray-700 mb-1">Lokasi Pengambilan <span class="text-red-500">*</span></label>
+                        <select id="pickupLocation" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                required>
+                            <option value="">Pilih lokasi pengambilan</option>
+                            <option value="Teras Masjid">Teras Masjid</option>
+                            <option value="Lobby Utama">Lobby Utama</option>
+                            <option value="Asrama Ikhwan">Asrama Ikhwan</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label for="orderDate" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengambilan</label>
                         <input type="date" 
                                id="orderDate" 
@@ -380,21 +415,9 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Waktu Pengambilan</label>
-                        <div class="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Pilih waktu pengambilan">
-                            <button type="button" 
-                                    class="time-slot-btn py-3 border-2 border-blue-500 bg-blue-50 text-blue-700 font-medium rounded-lg time-slot-selected focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    data-time="12:00"
-                                    role="radio"
-                                    aria-checked="true">
-                                12:00 WIB
-                            </button>
-                            <button type="button" 
-                                    class="time-slot-btn py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    data-time="13:00"
-                                    role="radio"
-                                    aria-checked="false">
-                                13:00 WIB
-                            </button>
+                        <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <p class="text-blue-800 font-medium">12:00 - 13:00 WIB</p>
+                            <p class="text-sm text-blue-600 mt-1">Waktu pengambilan sudah fix sesuai ketentuan kantin</p>
                         </div>
                     </div>
 
@@ -467,7 +490,6 @@
             cart: JSON.parse(localStorage.getItem('loginKantinCart')) || [],
             currentCategory: 'all',
             searchQuery: '',
-            selectedTime: '12:00',
             swiper: null
         };
 
@@ -654,6 +676,29 @@
             }
         }
 
+        function validateCheckoutForm() {
+            const customerName = document.getElementById('customerName').value.trim();
+            const customerStatus = document.getElementById('customerStatus').value;
+            const pickupLocation = document.getElementById('pickupLocation').value;
+            
+            if (!customerName) {
+                showToast('Harap masukkan nama lengkap', 'error');
+                return false;
+            }
+            
+            if (!customerStatus) {
+                showToast('Harap pilih status Anda', 'error');
+                return false;
+            }
+            
+            if (!pickupLocation) {
+                showToast('Harap pilih lokasi pengambilan', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
         // ===== CART MANAGEMENT =====
         function updateCart() {
             localStorage.setItem('loginKantinCart', JSON.stringify(state.cart));
@@ -690,6 +735,7 @@
                     id: menuItem.id,
                     name: menuItem.name,
                     price: menuItem.price,
+                    image: menuItem.image,
                     quantity: quantity
                 });
             }
@@ -906,14 +952,18 @@
             container.innerHTML = '';
             
             state.cart.forEach(item => {
+                const menuItem = MENU_DATA.find(m => m.id === item.id);
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
                 
                 const cartItem = document.createElement('div');
                 cartItem.className = 'flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200 mb-3';
                 cartItem.innerHTML = `
-                    <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
-                        <i class="fas fa-utensils text-gray-400"></i>
+                    <div class="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="${menuItem ? menuItem.image : ''}" 
+                             alt="${item.name}" 
+                             class="w-full h-full object-cover"
+                             onerror="handleImgError(this)">
                     </div>
                     
                     <div class="flex-1 min-w-0">
@@ -1035,7 +1085,7 @@
                     
                     <!-- Action Buttons -->
                     <div class="space-y-3">
-                        <button id="addToCartBtn" 
+                        <button id="updateCartBtn" 
                                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                             <i class="fas fa-cart-plus mr-2"></i>
                             ${quantity > 0 ? 'Update Keranjang' : 'Tambah ke Keranjang'}
@@ -1055,7 +1105,9 @@
             
             document.getElementById('closeMenuModal').addEventListener('click', closeMenuModal);
             document.getElementById('closeMenuModalBtn').addEventListener('click', closeMenuModal);
-            document.getElementById('addToCartBtn').addEventListener('click', () => {
+            
+            // FIX: Event listener yang benar untuk tombol Update Keranjang
+            document.getElementById('updateCartBtn').addEventListener('click', () => {
                 const quantity = parseInt(document.getElementById('modalQuantity').textContent);
                 if (quantity > 0) {
                     const currentItem = state.cart.find(cartItem => cartItem.id === itemId);
@@ -1066,13 +1118,16 @@
                             id: item.id,
                             name: item.name,
                             price: item.price,
+                            image: item.image,
                             quantity: quantity
                         });
                     }
                     updateCart();
                     showToast(`${item.name} ${currentItem ? 'diupdate' : 'ditambahkan'} ke keranjang`);
+                    closeMenuModal();
+                } else {
+                    showToast('Jumlah minimal 1', 'error');
                 }
-                closeMenuModal();
             });
             
             document.querySelectorAll('.modal-quantity-btn').forEach(btn => {
@@ -1102,6 +1157,12 @@
                 return;
             }
             
+            // Reset form
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerStatus').value = '';
+            document.getElementById('pickupLocation').value = '';
+            document.getElementById('orderNotes').value = '';
+            
             setOrderDate();
             updateTimeStatus();
             
@@ -1117,6 +1178,18 @@
 
         // ===== WHATSAPP ORDER =====
         function sendOrderViaWhatsApp() {
+            if (!validateCheckoutForm()) {
+                return;
+            }
+            
+            if (!isPreOrderTimeAllowed()) {
+                showToast('Pre-order hanya bisa dilakukan jam 07:00 - 20:00', 'error');
+                return;
+            }
+            
+            const customerName = document.getElementById('customerName').value.trim();
+            const customerStatus = document.getElementById('customerStatus').value;
+            const pickupLocation = document.getElementById('pickupLocation').value;
             const orderDate = document.getElementById('orderDate').value;
             const notes = document.getElementById('orderNotes').value;
             
@@ -1134,15 +1207,18 @@
             });
             
             let message = `*PRE-ORDER LOGIN KANTIN*\n\n`;
+            message += `Nama: ${customerName}\n`;
+            message += `Sebagai: ${customerStatus}\n`;
+            message += `Lokasi Pengambilan: ${pickupLocation}\n`;
             message += `Tanggal Pengambilan: ${formattedDate}\n`;
-            message += `Waktu: ${state.selectedTime} WIB\n\n`;
+            message += `Waktu Pengambilan: 12:00–13:00 WIB\n\n`;
             message += `*Detail Pesanan:*\n`;
             
             let total = 0;
             state.cart.forEach(item => {
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
-                message += `• ${item.name} x${item.quantity} = ${formatCurrency(itemTotal)}\n`;
+                message += `- ${item.name} (x${item.quantity}) – ${formatCurrency(itemTotal)}\n`;
             });
             
             message += `\n*Total: ${formatCurrency(total)}*\n`;
@@ -1184,21 +1260,6 @@
             document.getElementById('checkoutOverlay').addEventListener('click', closeCheckoutModal);
             document.getElementById('confirmOrderBtn').addEventListener('click', sendOrderViaWhatsApp);
             document.getElementById('menuModalOverlay').addEventListener('click', closeMenuModal);
-            
-            document.querySelectorAll('.time-slot-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.time-slot-btn').forEach(b => {
-                        b.classList.remove('time-slot-selected', 'border-blue-500', 'bg-blue-50', 'text-blue-700');
-                        b.classList.add('border-gray-300', 'text-gray-700');
-                        b.setAttribute('aria-checked', 'false');
-                    });
-                    
-                    this.classList.add('time-slot-selected', 'border-blue-500', 'bg-blue-50', 'text-blue-700');
-                    this.classList.remove('border-gray-300', 'text-gray-700');
-                    this.setAttribute('aria-checked', 'true');
-                    state.selectedTime = this.dataset.time;
-                });
-            });
             
             document.getElementById('searchInput').addEventListener('input', (e) => {
                 state.searchQuery = e.target.value;
