@@ -413,6 +413,20 @@
         <span id="floatingCartCount" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
     </button>
 
+    <!-- Image Fullscreen Modal (FITUR 1) -->
+    <div id="imageModal" class="fixed inset-0 z-[60] hidden" aria-hidden="true">
+        <div class="absolute inset-0 bg-black bg-opacity-90" id="imageModalOverlay"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <button id="closeImageModal" class="absolute top-4 right-4 z-10 p-3 text-white hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-white rounded-full">
+                <i class="fas fa-times text-2xl"></i>
+                <span class="sr-only">Tutup</span>
+            </button>
+            <div class="relative max-w-4xl max-h-[90vh] w-full">
+                <img id="modalImage" src="" alt="" class="w-full h-auto max-h-[90vh] object-contain rounded-lg">
+            </div>
+        </div>
+    </div>
+
     <!-- Cart Sidebar -->
     <div id="cartSidebar" class="fixed inset-0 z-50 hidden" aria-hidden="true">
         <div class="absolute inset-0 bg-black bg-opacity-50" id="cartOverlay"></div>
@@ -529,6 +543,47 @@
                         </select>
                     </div>
 
+                    <!-- FITUR 2: Metode Pembayaran -->
+                    <div class="pt-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Metode Pembayaran <span class="text-red-500">*</span></label>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="radio" id="paymentCash" name="paymentMethod" value="Cash saat ambil" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                                <label for="paymentCash" class="ml-3 block text-sm font-medium text-gray-700">
+                                    Cash saat ambil
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="paymentNonTunai" name="paymentMethod" value="Non-Tunai" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                <label for="paymentNonTunai" class="ml-3 block text-sm font-medium text-gray-700">
+                                    Non-Tunai
+                                </label>
+                            </div>
+                            
+                            <!-- Sub-opsi Non-Tunai -->
+                            <div id="nonTunaiOptions" class="ml-7 mt-2 space-y-2 hidden">
+                                <div class="flex items-center">
+                                    <input type="radio" id="paymentBSI" name="paymentNonTunai" value="BSI" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="paymentBSI" class="ml-3 block text-sm font-medium text-gray-700">
+                                        BSI
+                                    </label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="paymentDANA" name="paymentNonTunai" value="DANA" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="paymentDANA" class="ml-3 block text-sm font-medium text-gray-700">
+                                        DANA
+                                    </label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="paymentGoPay" name="paymentNonTunai" value="GoPay" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <label for="paymentGoPay" class="ml-3 block text-sm font-medium text-gray-700">
+                                        GoPay
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <label for="orderDate" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengambilan</label>
                         <input type="date" 
@@ -601,6 +656,75 @@
             img.parentElement.replaceChildren(wrapper);
         }
 
+        // ===== FITUR 1: Image Fullscreen Modal Functions =====
+        function openImageModal(imageSrc, altText) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            
+            modalImage.src = imageSrc;
+            modalImage.alt = altText;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // ===== FITUR 2: Payment Method Functions =====
+        function setupPaymentMethods() {
+            const nonTunaiRadio = document.getElementById('paymentNonTunai');
+            const nonTunaiOptions = document.getElementById('nonTunaiOptions');
+            const cashRadio = document.getElementById('paymentCash');
+            
+            // Reset semua radio non-tunai saat modal dibuka
+            const checkoutModal = document.getElementById('checkoutModal');
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        if (!checkoutModal.classList.contains('hidden')) {
+                            // Reset ke Cash saat ambil
+                            cashRadio.checked = true;
+                            nonTunaiOptions.classList.add('hidden');
+                            // Uncheck semua radio non-tunai
+                            document.querySelectorAll('input[name="paymentNonTunai"]').forEach(radio => {
+                                radio.checked = false;
+                            });
+                        }
+                    }
+                });
+            });
+            
+            observer.observe(checkoutModal, { attributes: true });
+            
+            // Toggle sub-opsi Non-Tunai
+            nonTunaiRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    nonTunaiOptions.classList.remove('hidden');
+                }
+            });
+            
+            cashRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    nonTunaiOptions.classList.add('hidden');
+                    // Uncheck semua radio non-tunai
+                    document.querySelectorAll('input[name="paymentNonTunai"]').forEach(radio => {
+                        radio.checked = false;
+                    });
+                }
+            });
+            
+            // Pastikan hanya satu yang terpilih di sub-opsi
+            document.querySelectorAll('input[name="paymentNonTunai"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.querySelectorAll('input[name="paymentNonTunai"]').forEach(r => {
+                        if (r !== this) r.checked = false;
+                    });
+                });
+            });
+        }
+
         // ===== CONFIGURATION =====
         const CONFIG = {
             PRE_ORDER_START: 7,
@@ -635,9 +759,9 @@
             {id: 11, name: "Basreng Pedas Daun Jeruk", price: 5000, category: "cemilan", description: "Basreng Yang Menyandu", details: "Dapet 2 pcs", image: "https://drive.google.com/thumbnail?id=1Lv_gH9fQ3pXH3_iC0pfz1-X5UIE0STWL&sz=w1000"},
 
             // === DESSERT ===
-            {id: 12, name: "Brownies (10x10 cm)", price: 25000, category: "dessert", description: "Selamat datang di surga para pecinta cokelat! Brownies kami memiliki tekstur fudgy yang padat di dalam, dan permukaan shiny crust yang renyah di luar. Dibuat dengan cokelat premium yang menghasilkan rasa pahit manis yang intens. Satu gigitan, langsung lupa diet!", details: "Ukuran 10x10 cm", image: "https://drive.google.com/thumbnail?id=1gfdNrrhWlkkxnq9D2RD4JGTBLLMnTTIL&sz=w1000"},
-            {id: 13, name: "Brownies (20x10 cm)", price: 45000, category: "dessert", description: "Selamat datang di surga para pecinta cokelat! Brownies kami memiliki tekstur fudgy yang padat di dalam, dan permukaan shiny crust yang renyah di luar. Dibuat dengan cokelat premium yang menghasilkan rasa pahit manis yang intens.", details: "Ukuran 20x10 cm", image: "https://drive.google.com/thumbnail?id=1pnGV9eb8XQyMJtYchDwHnLXJqDmiH02Z&sz=w1000"},
-            {id: 14, name: "Brownies (20x20 cm)", price: 90000, category: "dessert", description: "Selamat datang di surga para pecinta cokelat! Brownies kami memiliki tekstur fudgy yang padat di dalam, dan permukaan shiny crust yang renyah di luar. Dibuat dengan cokelat premium yang menghasilkan rasa pahit manis yang intens.", details: "Ukuran 20x20 cm", image: "https://drive.google.com/thumbnail?id=1Q1MCNNrgCtVtgDW3qTGmBpOijzfccj7n&sz=w1000"},
+            {id: 12, name: "Brownies (10x10 cm)", price: 25000, category: "dessert", description: "Brownies ukuran 10 x 10 ini cocok untuk Anda yang ingin menikmati porsi personal dengan kualitas premium. Teksturnya fudgy dan lembut di dalam, dipadukan dengan shiny crust yang renyah di bagian atas. Dibuat menggunakan cokelat pilihan dengan rasa pahit-manis yang seimbang. Pas untuk camilan cepat atau hadiah kecil yang berkesan.", details: "Ukuran 10x10 cm", image: "https://drive.google.com/thumbnail?id=1gfdNrrhWlkkxnq9D2RD4JGTBLLMnTTIL&sz=w1000"},
+            {id: 13, name: "Brownies (20x10 cm)", price: 45000, category: "dessert", description: "Pilihan tepat bagi Anda yang menginginkan ukuran sedang untuk dinikmati bersama atau disantap perlahan. Brownies 20 x 10 ini memiliki tekstur fudgy yang tebal, shiny crust yang khas, serta aroma cokelat premium yang kuat. Sangat cocok untuk menemani waktu santai maupun sebagai sajian ringan di berbagai kesempatan.", details: "Ukuran 20x10 cm", image: "https://drive.google.com/thumbnail?id=1pnGV9eb8XQyMJtYchDwHnLXJqDmiH02Z&sz=w1000"},
+            {id: 14, name: "Brownies (20x20 cm)", price: 90000, category: "dessert", description: "Brownies ukuran 20 x 20 ini dirancang untuk Anda yang membutuhkan porsi lebih besar, baik untuk keluarga maupun acara spesial. Teksturnya fudgy dan kaya, dengan shiny crust yang renyah dan menggunakan cokelat premium berkualitas tinggi. Pilihan yang tepat untuk hidangan utama di momen berbagi yang istimewa.", details: "Ukuran 20x20 cm", image: "https://drive.google.com/thumbnail?id=1Q1MCNNrgCtVtgDW3qTGmBpOijzfccj7n&sz=w1000"},
             {id: 15, name: "Piscok Siram Coklat Lumer", price: 10000, category: "dessert", description: "Makanan yg terbuat dari pisang yg dibungkus kulit lumpia kemudian di isi dengan coklat leleh.", details: "4 pcs piscok", image: "https://drive.google.com/thumbnail?id=1-QSYjZj42hj_hfKkZvZzPRKs6lvYXDXj&sz=w1000"},
             {id: 16, name: "Pisang Krispi", price: 10000, category: "dessert", description: "Cemilan dari pisang yg digoreng dengan tepung panir yg di beri lelehan coklat dan keju parut di atas nya.", details: "4 pcs", image: "https://drive.google.com/thumbnail?id=14O68_S7nDxOXMLAn1E9rULgI2P3HpmAE&sz=w1000"},
             {id: 17, name: "Mochi", price: 3000, category: "dessert", description: "Camilan lembut dan kenyal dengan isian manis yang lumer di mulut. Teksturnya halus, rasa manisnya pas, cocok buat pencuci mulut setelah makan pedas.", details: "", image: "https://drive.google.com/thumbnail?id=1idniT4ZF7TbIoFB89BQCQl2o8M6ce8QK&sz=w1000"},
@@ -808,6 +932,21 @@
                 return false;
             }
             
+            // Validasi metode pembayaran
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+            if (!paymentMethod) {
+                showToast('Harap pilih metode pembayaran', 'error');
+                return false;
+            }
+            
+            if (paymentMethod.value === 'Non-Tunai') {
+                const nonTunaiMethod = document.querySelector('input[name="paymentNonTunai"]:checked');
+                if (!nonTunaiMethod) {
+                    showToast('Harap pilih metode non-tunai', 'error');
+                    return false;
+                }
+            }
+            
             return true;
         }
 
@@ -964,13 +1103,15 @@
                 card.innerHTML = `
                     <div class="p-4">
                         <div class="flex items-start space-x-4">
-                            <!-- Image -->
-                            <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
+                            <!-- Image dengan event click untuk FITUR 1 -->
+                            <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 cursor-pointer product-image-container">
                                 <img src="${item.image}" 
                                      alt="${item.name}" 
-                                     class="w-full h-full object-cover"
+                                     class="w-full h-full object-cover product-image"
                                      loading="lazy"
-                                     onerror="handleImgError(this)">
+                                     onerror="handleImgError(this)"
+                                     data-src="${item.image}"
+                                     data-alt="${item.name}">
                             </div>
                             
                             <!-- Content -->
@@ -1023,6 +1164,16 @@
                 container.appendChild(card);
             });
             
+            // Event listeners untuk FITUR 1: Klik gambar produk
+            document.querySelectorAll('.product-image-container').forEach(container => {
+                container.addEventListener('click', function() {
+                    const img = this.querySelector('.product-image');
+                    const src = img.dataset.src || img.src;
+                    const alt = img.dataset.alt || img.alt;
+                    openImageModal(src, alt);
+                });
+            });
+            
             document.querySelectorAll('.quick-add-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     addToCart(parseInt(btn.dataset.id));
@@ -1071,11 +1222,13 @@
                 const cartItem = document.createElement('div');
                 cartItem.className = 'flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200 mb-3';
                 cartItem.innerHTML = `
-                    <div class="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-gray-100 cursor-pointer cart-product-image">
                         <img src="${menuItem ? menuItem.image : ''}" 
                              alt="${item.name}" 
                              class="w-full h-full object-cover"
-                             onerror="handleImgError(this)">
+                             onerror="handleImgError(this)"
+                             data-src="${menuItem ? menuItem.image : ''}"
+                             data-alt="${item.name}">
                     </div>
                     
                     <div class="flex-1 min-w-0">
@@ -1109,6 +1262,16 @@
             });
             
             document.getElementById('cartTotal').textContent = formatCurrency(total);
+            
+            // Event listeners untuk gambar di keranjang (FITUR 1)
+            document.querySelectorAll('.cart-product-image').forEach(container => {
+                container.addEventListener('click', function() {
+                    const img = this.querySelector('img');
+                    const src = img.dataset.src || img.src;
+                    const alt = img.dataset.alt || img.alt;
+                    openImageModal(src, alt);
+                });
+            });
             
             document.querySelectorAll('.cart-quantity-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -1160,12 +1323,14 @@
                         </button>
                     </div>
                     
-                    <!-- Image -->
-                    <div class="w-full h-48 rounded-xl bg-gray-100 mb-6 overflow-hidden">
+                    <!-- Image dengan event click untuk FITUR 1 -->
+                    <div class="w-full h-48 rounded-xl bg-gray-100 mb-6 overflow-hidden cursor-pointer modal-product-image">
                         <img src="${item.image}" 
                              alt="${item.name}" 
                              class="w-full h-full object-cover"
-                             onerror="handleImgError(this)">
+                             onerror="handleImgError(this)"
+                             data-src="${item.image}"
+                             data-alt="${item.name}">
                     </div>
                     
                     <!-- Description -->
@@ -1217,6 +1382,15 @@
             
             document.getElementById('closeMenuModal').addEventListener('click', closeMenuModal);
             document.getElementById('closeMenuModalBtn').addEventListener('click', closeMenuModal);
+            
+            // Event listener untuk gambar di modal detail (FITUR 1)
+            document.querySelector('.modal-product-image').addEventListener('click', function() {
+                const img = this.querySelector('img');
+                const src = img.dataset.src || img.src;
+                const alt = img.dataset.alt || img.alt;
+                closeMenuModal();
+                openImageModal(src, alt);
+            });
             
             // FIX: Event listener yang benar untuk tombol Update Keranjang
             document.getElementById('updateCartBtn').addEventListener('click', () => {
@@ -1275,6 +1449,13 @@
             document.getElementById('pickupLocation').value = '';
             document.getElementById('orderNotes').value = '';
             
+            // Reset payment method (FITUR 2)
+            document.getElementById('paymentCash').checked = true;
+            document.getElementById('nonTunaiOptions').classList.add('hidden');
+            document.querySelectorAll('input[name="paymentNonTunai"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
             setOrderDate();
             updateTimeStatus();
             
@@ -1305,6 +1486,17 @@
             const orderDate = document.getElementById('orderDate').value;
             const notes = document.getElementById('orderNotes').value;
             
+            // FITUR 2: Ambil data pembayaran
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            let paymentDetails = paymentMethod;
+            
+            if (paymentMethod === 'Non-Tunai') {
+                const nonTunaiMethod = document.querySelector('input[name="paymentNonTunai"]:checked');
+                if (nonTunaiMethod) {
+                    paymentDetails = `Non-Tunai (${nonTunaiMethod.value})`;
+                }
+            }
+            
             if (!orderDate) {
                 showToast('Silakan pilih tanggal pengambilan', 'error');
                 return;
@@ -1323,7 +1515,8 @@
             message += `Sebagai: ${customerStatus}\n`;
             message += `Lokasi Pengambilan: ${pickupLocation}\n`;
             message += `Tanggal Pengambilan: ${formattedDate}\n`;
-            message += `Waktu Pengambilan: 12:00–13:00 WIB\n\n`;
+            message += `Waktu Pengambilan: 12:00–13:00 WIB\n`;
+            message += `Metode Pembayaran: ${paymentDetails}\n\n`;
             message += `*Detail Pesanan:*\n`;
             
             let total = 0;
@@ -1363,6 +1556,11 @@
             
             setOrderDate();
             
+            // Event listeners untuk FITUR 1: Modal gambar
+            document.getElementById('imageModalOverlay').addEventListener('click', closeImageModal);
+            document.getElementById('closeImageModal').addEventListener('click', closeImageModal);
+            
+            // Event listeners lainnya
             document.getElementById('cartBtn').addEventListener('click', openCartSidebar);
             document.getElementById('floatingCartBtn').addEventListener('click', openCartSidebar);
             document.getElementById('closeCart').addEventListener('click', closeCartSidebar);
@@ -1377,6 +1575,9 @@
                 state.searchQuery = e.target.value;
                 renderMenu();
             });
+            
+            // Setup FITUR 2: Metode pembayaran
+            setupPaymentMethods();
             
             const confirmBtn = document.getElementById('confirmOrderBtn');
             if (confirmBtn) {
