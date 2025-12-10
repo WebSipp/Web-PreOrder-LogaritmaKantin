@@ -254,7 +254,7 @@
                 
                 <!-- Countdown -->
                 <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-6 full-width">
-                    <p class="text-sm mb-2 text-center">Pre Order Buka Kembali Setelah:</p>
+                    <p id="countdownText" class="text-sm mb-2 text-center">Pre Order Buka Kembali Setelah:</p>
                     <div id="countdown" class="text-2xl font-bold text-yellow-300 text-center tabular-nums">20:00:00</div>
                     <p class="text-xs mt-2 text-blue-100 text-center">Jam 20:00 pre-order untuk besok ditutup</p>
                 </div>
@@ -826,13 +826,16 @@
             if (hour < CONFIG.PRE_ORDER_START) {
                 targetTime = new Date(jakartaTime);
                 targetTime.setHours(CONFIG.PRE_ORDER_START, 0, 0, 0);
+                document.getElementById('countdownText').textContent = 'Pre Order Buka Kembali Setelah:';
             } else if (hour >= CONFIG.PRE_ORDER_START && hour < CONFIG.PRE_ORDER_END) {
                 targetTime = new Date(jakartaTime);
                 targetTime.setHours(CONFIG.PRE_ORDER_END, 0, 0, 0);
+                document.getElementById('countdownText').textContent = 'Toko buka, silahkan pesan sebelum:';
             } else {
                 targetTime = new Date(jakartaTime);
                 targetTime.setDate(targetTime.getDate() + 1);
                 targetTime.setHours(CONFIG.PRE_ORDER_START, 0, 0, 0);
+                document.getElementById('countdownText').textContent = 'Pre Order Buka Kembali Setelah:';
             }
             
             const diff = targetTime - jakartaTime;
