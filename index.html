@@ -477,6 +477,73 @@
         </div>
     </div>
 
+    <!-- Add to Cart Modal (FITUR BARU: Catatan Per Produk) -->
+    <div id="addToCartModal" class="fixed inset-0 z-[55] hidden" aria-hidden="true">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="addToCartOverlay"></div>
+        <div class="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl max-h-[90vh] overflow-y-auto fade-in full-width" role="dialog" aria-modal="true" aria-labelledby="addToCartTitle">
+            <div class="p-6 mobile-padding">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <h2 id="addToCartTitle" class="text-xl font-bold">Tambahkan ke Keranjang</h2>
+                    <button id="closeAddToCartModal" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 flex-shrink-0">
+                        <i class="fas fa-times text-gray-600 text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Product Info -->
+                <div class="mb-6">
+                    <h3 id="modalProductName" class="text-lg font-bold text-gray-900 mb-1"></h3>
+                    <p id="modalProductPrice" class="text-orange-600 font-medium"></p>
+                </div>
+
+                <!-- Form -->
+                <div class="space-y-4">
+                    <!-- Qty Input -->
+                    <div>
+                        <label for="productQty" class="block text-sm font-medium text-gray-700 mb-1">Jumlah <span class="text-red-500">*</span></label>
+                        <div class="flex items-center space-x-4">
+                            <button id="decreaseQty" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" 
+                                   id="productQty" 
+                                   min="1" 
+                                   value="1"
+                                   class="w-20 px-3 py-2 border border-gray-300 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   required>
+                            <button id="increaseQty" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Product Notes Input (FITUR BARU) -->
+                    <div>
+                        <label for="productNotes" class="block text-sm font-medium text-gray-700 mb-1">Catatan untuk produk ini (opsional)</label>
+                        <textarea id="productNotes" 
+                                  rows="3" 
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                  placeholder="Contoh: Level pedas, tanpa bawang, tambah keju, dll..."></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Catatan ini hanya untuk produk ini</p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="pt-4 border-t border-gray-200 space-y-3">
+                        <button id="confirmAddToCartBtn" 
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            <i class="fas fa-cart-plus mr-2"></i>
+                            Tambah ke Keranjang
+                        </button>
+                        <button id="cancelAddToCartBtn" 
+                                class="w-full border-2 border-gray-300 text-gray-700 font-medium py-3 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            Batal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Checkout Modal -->
     <div id="checkoutModal" class="fixed inset-0 z-50 hidden" aria-hidden="true">
         <div class="absolute inset-0 bg-black bg-opacity-50" id="checkoutOverlay"></div>
@@ -602,12 +669,14 @@
                         </div>
                     </div>
 
+                    <!-- CATATAN GLOBAL (TETAP ADA, TIDAK DIUBAH) -->
                     <div>
                         <label for="orderNotes" class="block text-sm font-medium text-gray-700 mb-1">Catatan (opsional)</label>
                         <textarea id="orderNotes" 
                                   rows="3" 
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                                   placeholder="Contoh: Level pedas, tanpa bawang, dll..."></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Catatan global untuk seluruh pesanan</p>
                     </div>
 
                     <div class="pt-4 border-t border-gray-200">
@@ -740,7 +809,8 @@
             cart: JSON.parse(localStorage.getItem('loginKantinCart')) || [],
             currentCategory: 'all',
             searchQuery: '',
-            swiper: null
+            swiper: null,
+            currentProductId: null // Untuk menyimpan ID produk yang sedang diproses
         };
 
         // ===== MENU DATA =====
@@ -766,16 +836,14 @@
             {id: 16, name: "Mochi", price: 3000, category: "dessert", description: "Camilan lembut dan kenyal dengan isian manis yang lumer di mulut. Teksturnya halus, rasa manisnya pas, cocok buat pencuci mulut setelah makan pedas.", details: "", image: "https://drive.google.com/thumbnail?id=1idniT4ZF7TbIoFB89BQCQl2o8M6ce8QK&sz=w1000"},
 
             // === MAKANAN ===
-            {id: 17, name: "Nasi Bakar Ayam", price: 12000, category: "makanan", description: "Nasi putih hangat dengan ayam bakar bumbu manis pedas, dilengkapi lalapan, dan sambal.", details: "", image: "https://drive.google.com/thumbnail?id=1EZem9UePajvVyZCwXUYu0yenC0ZGTntF&sz=w1000"},
-            {id: 18, name: "Mie Jebew", price: 13000, category: "makanan", description: "Mie kuning dengan sayuran dan daging ayam, disiram kuah pedas.", details: "", image: "https://drive.google.com/thumbnail?id=1BGhnPQZpgD3c7v119EgrHZPV4SqnOlz8&sz=w1000"},
-            {id: 29, name: "Kebab", price: 10000, category: "makanan", description: "Rasakan perpaduan sempurna daging premium yang dipanggang perlahan hingga juicy, dibalut tortilla lembut, dan disempurnakan dengan irisan sayuran segar dan saus spesial yang kaya rasa. Setiap gigitan adalah petualangan rasa yang nendang dan bikin ketagihan!", details: "", image: "https://drive.google.com/thumbnail?id=1ijbGNh4CmNlQFkk31wVcERpxP1YmsJZl&sz=w1000"},
-            {id: 20, name: "Nasi Cumi Pedas", price: 13000, category: "makanan", description: "Nasi cumi pedas + telur, pedasnya membangkitkan semangat🔥", details: "", image: "https://drive.google.com/thumbnail?id=1cdxizUzpGZLfTpq1acIAjKTTdnYQa5sA&sz=w1000"},
-            {id: 21, name: "Chicken Wings", price: 6000, category: "makanan", description: "Sayap ayam crispy dengan bumbu gurih pedas yang meresap sampai ke dalam. Bisa pilih saus—manis, pedas, atau BBQ. Juicy, wangi, dan bikin pengen nambah terus.", details: "", image: "https://drive.google.com/thumbnail?id=1vVBOFf-kltj81GPivZpOByqf91a3SBC2&sz=w1000"},
+            {id: 17, name: "Mie Jebew", price: 13000, category: "makanan", description: "Mie kuning dengan sayuran dan daging ayam, disiram kuah pedas.", details: "", image: "https://drive.google.com/thumbnail?id=1BGhnPQZpgD3c7v119EgrHZPV4SqnOlz8&sz=w1000"},
+            {id: 18, name: "Kebab", price: 10000, category: "makanan", description: "Rasakan perpaduan sempurna daging premium yang dipanggang perlahan hingga juicy, dibalut tortilla lembut, dan disempurnakan dengan irisan sayuran segar dan saus spesial yang kaya rasa. Setiap gigitan adalah petualangan rasa yang nendang dan bikin ketagihan!", details: "", image: "https://drive.google.com/thumbnail?id=1ijbGNh4CmNlQFkk31wVcERpxP1YmsJZl&sz=w1000"},
+            {id: 19, name: "Nasi Cumi Pedas", price: 13000, category: "makanan", description: "Nasi cumi pedas + telur, pedasnya membangkitkan semangat🔥", details: "", image: "https://drive.google.com/thumbnail?id=1cdxizUzpGZLfTpq1acIAjKTTdnYQa5sA&sz=w1000"},
+            {id: 20, name: "Chicken Wings", price: 6000, category: "makanan", description: "Sayap ayam crispy dengan bumbu gurih pedas yang meresap sampai ke dalam. Bisa pilih saus—manis, pedas, atau BBQ. Juicy, wangi, dan bikin pengen nambah terus.", details: "", image: "https://drive.google.com/thumbnail?id=1vVBOFf-kltj81GPivZpOByqf91a3SBC2&sz=w1000"},
 
             // === MINUMAN ===
-            {id: 22, name: "Yogurt", price: 10000, category: "minuman", description: "Minuman yogurt segar dan sehat", details: "", image: "https://drive.google.com/thumbnail?id=1GLm6MIdgA5_nTeJwmuKmyEOg4g5CdJjS&sz=w1000"},
-            {id: 23, name: "Susu Kurma", price: 15000, category: "minuman", description: "Minuman sehat yg terbuat dari 100% kurma asli dan susu.", details: "", image: "https://drive.google.com/thumbnail?id=1hoVzb5bUo4mXo4sKOnpDEKLcQfauD26g&sz=w1000"},
-            {id: 24, name: "Es Kuwut Bali", price: 7000, category: "minuman", description: "Minuman segar dengan campuran melon, kelapa muda, perasan jeruk nipis, biji selasih, dan es batu. Rasanya manis, asem, dan fresh.", details: "", image: "https://drive.google.com/thumbnail?id=1Dpt-Xs4a3KXtHjc2JogDajcjmRS3e7N-&sz=w1000"}
+            {id: 21, name: "Yogurt", price: 10000, category: "minuman", description: "Minuman yogurt segar dan sehat", details: "", image: "https://drive.google.com/thumbnail?id=1GLm6MIdgA5_nTeJwmuKmyEOg4g5CdJjS&sz=w1000"},
+            {id: 22, name: "Susu Kurma", price: 15000, category: "minuman", description: "Minuman sehat yg terbuat dari 100% kurma asli dan susu.", details: "", image: "https://drive.google.com/thumbnail?id=1hoVzb5bUo4mXo4sKOnpDEKLcQfauD26g&sz=w1000"},
         ];
 
         // ===== UTILITY FUNCTIONS =====
@@ -967,7 +1035,8 @@
             renderMenu();
         }
 
-        function addToCart(itemId, quantity = 1) {
+        // FITUR BARU: Fungsi untuk menambahkan ke keranjang dengan catatan per produk
+        function addToCartWithNotes(itemId, quantity, notes) {
             const now = getJakartaTime();
             const hour = now.getHours();
             
@@ -983,13 +1052,22 @@
             
             if (existingItem) {
                 existingItem.quantity += quantity;
+                // Jika ada catatan baru, gabungkan dengan catatan lama (jika ada)
+                if (notes && notes.trim()) {
+                    if (existingItem.notes) {
+                        existingItem.notes = existingItem.notes + '; ' + notes.trim();
+                    } else {
+                        existingItem.notes = notes.trim();
+                    }
+                }
             } else {
                 state.cart.push({
                     id: menuItem.id,
                     name: menuItem.name,
                     price: menuItem.price,
                     image: menuItem.image,
-                    quantity: quantity
+                    quantity: quantity,
+                    notes: notes ? notes.trim() : '' // FITUR BARU: Simpan catatan per produk
                 });
             }
             
@@ -1013,6 +1091,52 @@
                     updateCart();
                 }
             }
+        }
+
+        // ===== FITUR BARU: Modal Catatan Per Produk =====
+        function openAddToCartModal(itemId) {
+            if (!isPreOrderTimeAllowed()) {
+                showToast('Pre-order hanya bisa dilakukan jam 07:00 - 20:00', 'error');
+                return;
+            }
+            
+            const item = MENU_DATA.find(m => m.id === itemId);
+            if (!item) return;
+            
+            state.currentProductId = itemId;
+            
+            // Set nilai modal
+            document.getElementById('modalProductName').textContent = item.name;
+            document.getElementById('modalProductPrice').textContent = formatCurrency(item.price);
+            document.getElementById('productQty').value = 1;
+            document.getElementById('productNotes').value = '';
+            
+            // Tampilkan modal
+            document.getElementById('addToCartModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAddToCartModal() {
+            document.getElementById('addToCartModal').classList.add('hidden');
+            document.body.style.overflow = '';
+            state.currentProductId = null;
+        }
+
+        function handleAddToCartConfirmation() {
+            const itemId = state.currentProductId;
+            if (!itemId) return;
+            
+            const qtyInput = document.getElementById('productQty');
+            const quantity = parseInt(qtyInput.value);
+            const notes = document.getElementById('productNotes').value;
+            
+            if (quantity < 1) {
+                showToast('Jumlah minimal 1', 'error');
+                return;
+            }
+            
+            addToCartWithNotes(itemId, quantity, notes);
+            closeAddToCartModal();
         }
 
         // ===== RENDERING =====
@@ -1176,9 +1300,10 @@
                 });
             });
             
+            // FITUR BARU: Ganti event listener untuk quick-add-btn
             document.querySelectorAll('.quick-add-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    addToCart(parseInt(btn.dataset.id));
+                    openAddToCartModal(parseInt(btn.dataset.id));
                 });
             });
             
@@ -1222,7 +1347,7 @@
                 total += itemTotal;
                 
                 const cartItem = document.createElement('div');
-                cartItem.className = 'flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200 mb-3';
+                cartItem.className = 'flex items-start space-x-4 p-4 bg-white rounded-lg border border-gray-200 mb-3';
                 cartItem.innerHTML = `
                     <div class="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-gray-100 cursor-pointer cart-product-image">
                         <img src="${menuItem ? menuItem.image : ''}" 
@@ -1236,6 +1361,13 @@
                     <div class="flex-1 min-w-0">
                         <h4 class="font-medium text-gray-900 truncate">${item.name}</h4>
                         <p class="text-sm text-orange-600 font-medium">${formatCurrency(item.price)}</p>
+                        
+                        <!-- FITUR BARU: Tampilkan catatan per produk jika ada -->
+                        ${item.notes ? `
+                            <div class="mt-2 p-2 bg-blue-50 rounded border border-blue-100">
+                                <p class="text-xs text-blue-700"><strong>Catatan:</strong> ${item.notes}</p>
+                            </div>
+                        ` : ''}
                     </div>
                     
                     <div class="flex items-center space-x-3">
@@ -1394,7 +1526,7 @@
                 openImageModal(src, alt);
             });
             
-            // FIX: Event listener yang benar untuk tombol Update Keranjang
+            // Event listener untuk tombol Update Keranjang di modal detail
             document.getElementById('updateCartBtn').addEventListener('click', () => {
                 const quantity = parseInt(document.getElementById('modalQuantity').textContent);
                 if (quantity > 0) {
@@ -1407,7 +1539,8 @@
                             name: item.name,
                             price: item.price,
                             image: item.image,
-                            quantity: quantity
+                            quantity: quantity,
+                            notes: '' // Default kosong untuk modal detail
                         });
                     }
                     updateCart();
@@ -1525,13 +1658,19 @@
             state.cart.forEach(item => {
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
-                message += `- ${item.name} (x${item.quantity}) – ${formatCurrency(itemTotal)}\n`;
+                message += `- ${item.name} (x${item.quantity}) – ${formatCurrency(itemTotal)}`;
+                // FITUR BARU: Tambahkan catatan per produk jika ada
+                if (item.notes && item.notes.trim()) {
+                    message += `\n  Catatan: ${item.notes}`;
+                }
+                message += `\n`;
             });
             
             message += `\n*Total: ${formatCurrency(total)}*\n`;
             
+            // CATATAN GLOBAL TETAP ADA (tidak diubah)
             if (notes.trim()) {
-                message += `\nCatatan: ${notes}\n`;
+                message += `\nCatatan global: ${notes}\n`;
             }
             
             message += `\n_Pre-order via website LOGIN Kantin_`;
@@ -1562,6 +1701,34 @@
             document.getElementById('imageModalOverlay').addEventListener('click', closeImageModal);
             document.getElementById('closeImageModal').addEventListener('click', closeImageModal);
             
+            // Event listeners untuk FITUR BARU: Modal catatan per produk
+            document.getElementById('addToCartOverlay').addEventListener('click', closeAddToCartModal);
+            document.getElementById('closeAddToCartModal').addEventListener('click', closeAddToCartModal);
+            document.getElementById('cancelAddToCartBtn').addEventListener('click', closeAddToCartModal);
+            document.getElementById('confirmAddToCartBtn').addEventListener('click', handleAddToCartConfirmation);
+            
+            // Event listeners untuk qty controls di modal catatan per produk
+            document.getElementById('decreaseQty').addEventListener('click', () => {
+                const qtyInput = document.getElementById('productQty');
+                let value = parseInt(qtyInput.value);
+                if (value > 1) {
+                    qtyInput.value = value - 1;
+                }
+            });
+            
+            document.getElementById('increaseQty').addEventListener('click', () => {
+                const qtyInput = document.getElementById('productQty');
+                let value = parseInt(qtyInput.value);
+                qtyInput.value = value + 1;
+            });
+            
+            document.getElementById('productQty').addEventListener('input', (e) => {
+                let value = parseInt(e.target.value);
+                if (value < 1 || isNaN(value)) {
+                    e.target.value = 1;
+                }
+            });
+            
             // Event listeners lainnya
             document.getElementById('cartBtn').addEventListener('click', openCartSidebar);
             document.getElementById('floatingCartBtn').addEventListener('click', openCartSidebar);
@@ -1591,5 +1758,3 @@
     </script>
 </body>
 </html>
-
-
